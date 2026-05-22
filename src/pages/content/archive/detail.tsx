@@ -450,13 +450,13 @@ class ArchiveForm extends React.Component<intlProps> {
     for (const row of rows) {
       let exists = false;
       for (const i in archive.images) {
-        if (archive.images[i] === row.logo) {
+        if (archive.images[i] === row.file_path) {
           exists = true;
           break;
         }
       }
       if (!exists) {
-        archive.images.push(row.logo);
+        archive.images.push(row.file_path);
       }
     }
     this.setState({
@@ -798,13 +798,13 @@ class ArchiveForm extends React.Component<intlProps> {
 
   handleUploadExtraField = (field: string, row: any) => {
     const extra: any = {};
-    extra[field] = { value: row.logo };
+    extra[field] = { value: row.file_path };
     this.formRef?.current?.setFieldsValue({ extra });
     const { archive } = this.state;
     if (!archive.extra[field]) {
       archive.extra[field] = {};
     }
-    archive.extra[field].value = row.logo;
+    archive.extra[field].value = row.file_path;
 
     this.setState({
       archive,
@@ -862,13 +862,13 @@ class ArchiveForm extends React.Component<intlProps> {
     for (const row of rows) {
       let exists = false;
       for (const i in archive.extra[field].value) {
-        if (archive.extra[field].value[i] === row.logo) {
+        if (archive.extra[field].value[i] === row.file_path) {
           exists = true;
           break;
         }
       }
       if (!exists) {
-        archive.extra[field].value.push(row.logo);
+        archive.extra[field].value.push(row.file_path);
       }
     }
     const extra: any = {};
@@ -1077,13 +1077,13 @@ class ArchiveForm extends React.Component<intlProps> {
     for (const row of rows) {
       let exists = false;
       for (const i in extraTimelines[field].images) {
-        if (extraTimelines[field].images[i] === row.logo) {
+        if (extraTimelines[field].images[i] === row.file_path) {
           exists = true;
           break;
         }
       }
       if (!exists) {
-        extraTimelines[field].images.push(row.logo);
+        extraTimelines[field].images.push(row.file_path);
       }
     }
     const extra: any = {};
@@ -1182,13 +1182,13 @@ class ArchiveForm extends React.Component<intlProps> {
     for (const row of rows) {
       let exists = false;
       for (const i in extraTimelines[field].items[idx].images) {
-        if (extraTimelines[field].items[idx].images[i] === row.logo) {
+        if (extraTimelines[field].items[idx].images[i] === row.file_path) {
           exists = true;
           break;
         }
       }
       if (!exists) {
-        extraTimelines[field].items[idx].images.push(row.logo);
+        extraTimelines[field].items[idx].images.push(row.file_path);
       }
     }
     const extra: any = {};
@@ -2244,11 +2244,14 @@ class ArchiveForm extends React.Component<intlProps> {
                                           title: cat.title,
                                           label: (
                                             <div title={cat.title}>
-                                              {cat.parent_titles?.length > 0 ? (
+                                              {cat.parents?.length > 0 ? (
                                                 <span className="text-muted">
-                                                  {cat.parent_titles?.join(
-                                                    ' > ',
-                                                  )}
+                                                  {cat.parents
+                                                    ?.map(
+                                                      (parent: any) =>
+                                                        parent.title,
+                                                    )
+                                                    .join(' > ')}
                                                   {' > '}
                                                 </span>
                                               ) : (
@@ -2973,9 +2976,11 @@ class ArchiveForm extends React.Component<intlProps> {
                         title: cat.title,
                         label: (
                           <div title={cat.title}>
-                            {cat.parent_titles?.length > 0 ? (
+                            {cat.parents?.length > 0 ? (
                               <span className="text-muted">
-                                {cat.parent_titles?.join(' > ')}
+                                {cat.parents
+                                  ?.map((parent: any) => parent.title)
+                                  .join(' > ')}
                                 {' > '}
                               </span>
                             ) : (

@@ -85,8 +85,8 @@ const AiImageGenerate: React.FC<AiImageGenerateProps> = (props) => {
     setAiResult({});
     anqiAiImageGenerate({
       prompt: values.prompt,
-      type: props.attach?.logo ? 2 : 0,
-      image: props.attach?.logo,
+      type: props.attach?.file_path ? 2 : 0,
+      image: props.attach?.file_path,
       size: size,
     })
       .then(async (res) => {
@@ -248,13 +248,13 @@ const AiImageGenerate: React.FC<AiImageGenerateProps> = (props) => {
           </div>
         </div>
         <ProForm layout="horizontal" formRef={formRef} submitter={false}>
-          {props.attach?.logo && (
+          {props.attach?.file_path && (
             <ProFormText
               label={props.intl?.formatMessage({
                 id: 'component.aiimage.image',
               })}
             >
-              <Image src={props.attach?.logo} width={160} />
+              <Image src={props.attach?.file_path} width={160} />
             </ProFormText>
           )}
           <ProFormTextArea

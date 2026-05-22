@@ -3,10 +3,15 @@ import React from 'react';
 import './index.less';
 
 const ImageItem: React.FC<
-  ImageProps & { isImage?: boolean; timestamp?: any; size?: any }
+  ImageProps & {
+    isImage?: number;
+    previewSrc?: string;
+    timestamp?: any;
+    size?: any;
+  }
 > = (props) => {
   const isImage =
-    props.isImage ||
+    props.isImage === 1 ||
     props.src?.endsWith('.png') ||
     props.src?.endsWith('.jpg') ||
     props.src?.endsWith('.jpeg') ||
@@ -21,16 +26,42 @@ const ImageItem: React.FC<
     <Image
       width={'100%'}
       className="img"
-      preview={{
-        src: props.src + '?t=' + props.timestamp,
-      }}
+      preview={
+        props.preview === false
+          ? false
+          : props.isImage === 2 ||
+            props.src?.endsWith('.mp4') ||
+            props.src?.endsWith('.webm')
+          ? {
+              src: props.previewSrc || props.src + '?t=' + props.timestamp,
+              imageRender: () => (
+                <video
+                  controls
+                  style={{ maxWidth: '100%', maxHeight: '100%' }}
+                  poster={props.src}
+                >
+                  <source
+                    src={
+                      props.previewSrc || props.src + '?t=' + props.timestamp
+                    }
+                  />
+                  您的浏览器不支持 video 标签。
+                </video>
+              ),
+            }
+          : props.preview || {
+              src: props.previewSrc || props.src + '?t=' + props.timestamp,
+            }
+      }
       src={props.src + '?t=' + props.timestamp}
       alt={props.alt}
     />
   ) : (
-    <Avatar className="default-img" size={props.size || 200} alt={props.alt}>
-      {props.src?.substring(props.src?.lastIndexOf('.')).toUpperCase()}
-    </Avatar>
+    <a href={props.src} target="_blank" rel="noreferrer">
+      <Avatar className="default-img" size={props.size || 200} alt={props.alt}>
+        {props.src?.substring(props.src?.lastIndexOf('.')).toUpperCase()}
+      </Avatar>
+    </a>
   );
 };
 

@@ -138,7 +138,7 @@ const UserForm: React.FC<UserFormProps> = (props) => {
 
   const handleUploadExtraField = (field: string, row: any) => {
     const extra: any = {};
-    extra[field] = { value: row.logo };
+    extra[field] = { value: row.file_path };
     formRef?.current?.setFieldsValue({ extra });
     if (!user.extra) {
       user.extra = {};
@@ -146,7 +146,7 @@ const UserForm: React.FC<UserFormProps> = (props) => {
     if (!user.extra[field]) {
       user.extra[field] = {};
     }
-    user.extra[field].value = row.logo;
+    user.extra[field].value = row.file_path;
 
     setUser((prevUser: any) => ({
       ...prevUser,
@@ -210,13 +210,13 @@ const UserForm: React.FC<UserFormProps> = (props) => {
     for (const row of rows) {
       let exists = false;
       for (const i in user.extra[field].value) {
-        if (user.extra[field].value[i] === row.logo) {
+        if (user.extra[field].value[i] === row.file_path) {
           exists = true;
           break;
         }
       }
       if (!exists) {
-        user.extra[field].value.push(row.logo);
+        user.extra[field].value.push(row.file_path);
       }
     }
     const extra: any = {};
@@ -362,10 +362,10 @@ const UserForm: React.FC<UserFormProps> = (props) => {
   };
 
   const handleUploadAvatarUrl = (row: any) => {
-    user.avatar_url = row.logo;
+    user.avatar_url = row.file_path;
     setUser((prevUser: any) => ({
       ...prevUser,
-      avatar_url: row.logo,
+      avatar_url: row.file_path,
     }));
   };
 
@@ -890,9 +890,11 @@ const UserForm: React.FC<UserFormProps> = (props) => {
                   title: cat.title,
                   label: (
                     <div title={cat.title}>
-                      {cat.parent_titles?.length > 0 ? (
+                      {cat.parents?.length > 0 ? (
                         <span className="text-muted">
-                          {cat.parent_titles?.join(' > ')}
+                          {cat.parents
+                            ?.map((parent: any) => parent.title)
+                            .join(' > ')}
                           {' > '}
                         </span>
                       ) : (

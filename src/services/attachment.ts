@@ -71,3 +71,14 @@ export async function deleteAttachmentCategory(body: any, options?: { [key: stri
     options,
   });
 }
+
+export async function addUrlToAttachment(
+  body: any,
+  options?: { [key: string]: any },
+) {
+  return post({
+    url: '/attachment/addurl',
+    body,
+    options,
+  });
+}

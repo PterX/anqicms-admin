@@ -207,13 +207,13 @@ const SettingDiyFieldFrom: React.FC<any> = () => {
     for (const row of rows) {
       let exists = false;
       for (const i in setting[index].value) {
-        if (setting[index].value[i] === row.logo) {
+        if (setting[index].value[i] === row.file_path) {
           exists = true;
           break;
         }
       }
       if (!exists) {
-        setting[index].value.push(row.logo);
+        setting[index].value.push(row.file_path);
       }
     }
 
@@ -225,7 +225,7 @@ const SettingDiyFieldFrom: React.FC<any> = () => {
   };
 
   const handleUploadExtraField = (index: number, row: any) => {
-    handleUpdateFieldValue(index, row.logo);
+    handleUpdateFieldValue(index, row.file_path);
   };
 
   const handleDeleteField = (index: number) => {
@@ -1034,9 +1034,11 @@ const SettingDiyFieldFrom: React.FC<any> = () => {
                           title: cat.title,
                           label: (
                             <div title={cat.title}>
-                              {cat.parent_titles?.length > 0 ? (
+                              {cat.parents?.length > 0 ? (
                                 <span className="text-muted">
-                                  {cat.parent_titles?.join(' > ')}
+                                  {cat.parents
+                                    ?.map((parent: any) => parent.title)
+                                    .join(' > ')}
                                   {' > '}
                                 </span>
                               ) : (

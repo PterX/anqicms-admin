@@ -24,6 +24,9 @@ export default {
     'Refers to the PC access URL of the website, such as: https://www.anqicms.com, used to generate the absolute address of the entire site',
   'setting.system.base-url-error':
     'Please enter the homepage address of the website!',
+  'setting.system.front-url': 'Frontend URL',
+  'setting.system.front-url-description':
+    'Refers to the frontend access URL of the website, such as: https://www.anqicms.com, if it is a frontend-backend separated website (such as the frontend is Next.js), and each uses an independent domain name, it needs to be set.',
   'setting.system.mobile-url': 'Mobile address',
   'setting.system.mobile-url-description':
     'Refers to the mobile access URL of the website, such as: https://m.anqicms.com. If the template type is PC+mobile site, it needs to be set.',
@@ -270,4 +273,49 @@ export default {
     'The smaller the value, the higher the sorting is. The default is 99.',
   'plugin.diyfield.setting': 'Field configuration',
   'setting.diyfield.name-duplicate': 'Parameter name cannot be repeated',
+  'setting.currency.currency-name': 'Currency name',
+  'setting.currency.currency-code': 'International currency code',
+  'setting.currency.currency-code.description':
+    'For example: CNY, USD, EUR, etc.',
+  'setting.currency.currency-symbol': 'Currency symbol',
+  'setting.currency.currency-symbol.description': 'For example: ￥, $, €, etc.',
+  'setting.shop.info': 'Shop Information',
+  'setting.shop.name': 'Shop Name',
+  'setting.shop.name-description':
+    'The name of the shop, will be displayed on the shop homepage',
+  'setting.shop.logo': 'Shop Logo',
+  'setting.shop.logo-description':
+    'The shop logo will be displayed on the header and shop homepage',
+  'setting.shop.description': 'Shop Introduction',
+  'setting.shop.description-placeholder': 'Please enter shop introduction',
+  'setting.shop.description-description':
+    'A simple introduction of the shop, will be displayed on the shop homepage',
+  'setting.shop.business-hours': 'Business Hours',
+  'setting.shop.business-hours-placeholder':
+    'For example: Monday to Sunday 9:00-18:00',
+  'setting.shop.business-hours-description': 'The business hours of the shop',
+  'setting.shop.delivery-location': 'Delivery Location',
+  'setting.shop.delivery-location-placeholder':
+    'Please enter delivery location',
+  'setting.shop.shipping-time': 'Estimated Shipping Time',
+  'setting.shop.shipping-time.suffix': 'days',
+  'setting.shop.shipping-time-placeholder':
+    'For example: Ship within 48 hours after order placement',
+  'setting.shop.shipping-time-description':
+    'The estimated shipping time for orders',
+  'setting.shipping.logistics': 'Shipping Settings',
+  'setting.shipping.units': 'Length Unit List',
+  'setting.shipping.add-unit': 'Add Unit',
+  'setting.shipping.length-unit-name': 'Length Unit Name',
+  'setting.shipping.volume-unit-name': 'Volume Unit Name',
+  'setting.shipping.ratio-to-m': 'Divisor to m',
+  'setting.shipping.ratio-to-m.suffix': 'm',
+  'setting.shipping.weight-units': 'Weight Unit List',
+  'setting.shipping.weight-unit-name': 'Weight Unit Name',
+  'setting.shipping.ratio-to-kg': 'Divisor to kg',
+  'setting.shipping.ratio-to-kg.suffix': 'kg',
+  'setting.shipping.volumetric-divisor': 'Volumetric Weight Divisor',
+  'setting.shipping.volumetric-divisor-placeholder': 'Please enter divisor',
+  'setting.shipping.volumetric-divisor-description':
+    'Volumetric Weight (kg) = Volume (cm³) / Divisor. 0 means disabled. Common values: 6000 for domestic express, 5000 for international logistics.',
 };

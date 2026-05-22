@@ -176,13 +176,13 @@ class CollectorSetting extends React.Component<CollectorSettingProps> {
     for (const row of rows) {
       let exists = false;
       for (let i in setting['images']) {
-        if (setting['images'][i] === row.logo) {
+        if (setting['images'][i] === row.file_path) {
           exists = true;
           break;
         }
       }
       if (!exists) {
-        setting['images'].push(row.logo);
+        setting['images'].push(row.file_path);
       }
     }
     this.setState({
@@ -580,9 +580,11 @@ class CollectorSetting extends React.Component<CollectorSettingProps> {
                   title: cat.title,
                   label: (
                     <div title={cat.title}>
-                      {cat.parent_titles?.length > 0 ? (
+                      {cat.parents?.length > 0 ? (
                         <span className="text-muted">
-                          {cat.parent_titles?.join(' > ')}
+                          {cat.parents
+                            ?.map((parent: any) => parent.title)
+                            .join(' > ')}
                           {' > '}
                         </span>
                       ) : (

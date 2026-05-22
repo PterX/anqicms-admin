@@ -6,7 +6,7 @@ import config from '@/services/config';
 import { getSessionStore, getStore } from '@/utils/store';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
-import { Button, Input, message, Modal, Space, Tooltip } from 'antd';
+import { Button, Input, Modal, Space, Tooltip, message } from 'antd';
 import {
   forwardRef,
   useEffect,
@@ -54,7 +54,7 @@ const NewAiEditor: React.FC<NewAiEditorProps> = forwardRef((props, ref) => {
 
   const getImagehtml = (item: any) => {
     if (
-      item.is_image ||
+      item.is_image === 1 ||
       item.file_location.indexOf('.webp') !== -1 ||
       item.file_location.indexOf('.bmp') !== -1 ||
       item.file_location.indexOf('.png') !== -1 ||
@@ -64,16 +64,18 @@ const NewAiEditor: React.FC<NewAiEditorProps> = forwardRef((props, ref) => {
       item.file_location.indexOf('.svg') !== -1
     ) {
       // img
-      return `<img src="${item.logo}" alt="${item.file_name}" title="${item.file_name}" />`;
-      //return `![${item.file_name}](${item.logo})`;
+      return `<img src="${item.file_path}" alt="${item.file_name}" title="${item.file_name}" />`;
+      //return `![${item.file_name}](${item.file_path})`;
     } else if (
       item.is_image === 2 ||
       item.file_location.indexOf('.mp4') !== -1 ||
       item.file_location.indexOf('.ogg') !== -1 ||
       item.file_location.indexOf('.webm') !== -1
     ) {
-      return `<video controls="controls" controlslist="nodownload" poster=""><source src="${
+      return `<video controls="controls" controlslist="nodownload" poster="${
         item.logo
+      }"><source src="${
+        item.file_path
       }" type="video/${item.file_location.substr(
         item.file_location.lastIndexOf('.') + 1,
       )}">Your browser does not support video tags.</video>`;
@@ -81,15 +83,15 @@ const NewAiEditor: React.FC<NewAiEditorProps> = forwardRef((props, ref) => {
       item.file_location.indexOf('.mp3') !== -1 ||
       item.file_location.indexOf('.wav') !== -1
     ) {
-      return `<audio src="${item.logo}" controls="controls"><source src="${
-        item.logo
+      return `<audio src="${item.file_path}" controls="controls"><source src="${
+        item.file_path
       }" type="audio/${item.file_location.substr(
         item.file_location.lastIndexOf('.') + 1,
       )}">Your browser does not support audio tags.</audio>`;
     } else if (item.is_image === 3) {
       return `<iframe src="${item.file_location}" title="${item.file_name}" width="100%" height="480px" frameborder="0" allowfullscreen="true"></iframe>`;
     } else {
-      return `<a href="${item.logo}" target="_blank" title="${item.file_name}">${item.file_name}</a>`;
+      return `<a href="${item.file_path}" target="_blank" title="${item.file_name}">${item.file_name}</a>`;
     }
   };
   function attachPlugin(editor: AiEditor) {
@@ -155,7 +157,7 @@ const NewAiEditor: React.FC<NewAiEditorProps> = forwardRef((props, ref) => {
       result.msg = res.msg;
       return Promise.reject(result);
     } else {
-      result.data.src = res.data.logo;
+      result.data.src = res.data.file_path;
       result.data.alt = res.data.file_name;
     }
     return result;

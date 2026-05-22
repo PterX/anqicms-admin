@@ -243,7 +243,7 @@ const PluginMultiLang: React.FC<any> = () => {
   };
 
   const handleSelectImage = (row: any) => {
-    currentSite.language_icon = row.logo;
+    currentSite.language_icon = row.file_path;
     setCurrentSite({ ...currentSite });
   };
 

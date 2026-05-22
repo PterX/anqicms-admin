@@ -3,7 +3,7 @@ import {
   getAttachments,
   uploadAttachment,
 } from '@/services/attachment';
-import { calculateFileMd5 } from '@/utils';
+import { acceptedExtensions, calculateFileMd5 } from '@/utils';
 import { CloseOutlined } from '@ant-design/icons';
 import { ActionType, ProList } from '@ant-design/pro-components';
 import {
@@ -19,6 +19,7 @@ import {
 } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import AiImageGenerate from '../aiimage';
+import AttachmentAddUrl from './addUrl';
 import './index.less';
 
 export type AttachmentContentProps = {
@@ -37,6 +38,7 @@ const AttachmentContent: React.FC<AttachmentContentProps> = (props) => {
   const [categoryId, setCategoryId] = useState<number>(0);
   const [keyword, setKeyword] = useState<string>('');
   const [aiVisible, setAiVisible] = useState<boolean>(false);
+  const [addUrlVisible, setAddUrlVisible] = useState<boolean>(false);
 
   useEffect(() => {
     getAttachmentCategories().then((res) => {
@@ -44,6 +46,9 @@ const AttachmentContent: React.FC<AttachmentContentProps> = (props) => {
     });
   }, []);
 
+  const handleAddUrl = () => {
+    setAddUrlVisible(true);
+  };
   const handleUploadImage = async (e: any) => {
     // 上传前先计算MD5
     let hide = message.loading({
@@ -190,6 +195,11 @@ const AttachmentContent: React.FC<AttachmentContentProps> = (props) => {
     setAiVisible(false);
   };
 
+  const handleSubmitAddUrl = () => {
+    actionRef.current?.reloadAndRest?.();
+    setAddUrlVisible(false);
+  };
+
   return (
     <div style={props.style} className={props.className}>
       <div className="material-header">
@@ -221,7 +231,7 @@ const AttachmentContent: React.FC<AttachmentContentProps> = (props) => {
             name="file"
             showUploadList={false}
             multiple
-            //accept="*"
+            accept={acceptedExtensions}
             customRequest={handleUploadImage}
           >
             <Button type="primary">
@@ -230,6 +240,10 @@ const AttachmentContent: React.FC<AttachmentContentProps> = (props) => {
               }) || '上传新文件'}
             </Button>
           </Upload>
+          <Button onClick={() => handleAddUrl()}>
+            {props.intl?.formatMessage({ id: 'content.attachment.add-url' }) ||
+              '添加远程资源'}
+          </Button>
           <Button type="default" onClick={handleGenerateImage}>
             {props.intl?.formatMessage({
               id: 'component.aiimage.generate',
@@ -289,13 +303,17 @@ const AttachmentContent: React.FC<AttachmentContentProps> = (props) => {
                         <Image
                           className="img"
                           preview={{
-                            src: row.logo,
+                            src: row.file_path,
                           }}
                           src={row.thumb}
                           alt={row.file_name}
                         />
                       ) : (
-                        <a href={row.logo} target="_blank" rel="noreferrer">
+                        <a
+                          href={row.file_path}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
                           <Avatar className="default-img" size={100}>
                             {row.file_location.substring(
                               row.file_location.lastIndexOf('.'),
@@ -327,6 +345,14 @@ const AttachmentContent: React.FC<AttachmentContentProps> = (props) => {
           onCancel={() => setAiVisible(false)}
           onSubmit={handleSubmitAi}
           open={aiVisible}
+          intl={props.intl}
+        />
+      )}
+      {addUrlVisible && (
+        <AttachmentAddUrl
+          onCancel={() => setAddUrlVisible(false)}
+          onSubmit={handleSubmitAddUrl}
+          open={addUrlVisible}
           intl={props.intl}
         />
       )}

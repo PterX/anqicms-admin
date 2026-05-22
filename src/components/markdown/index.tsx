@@ -34,7 +34,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = forwardRef(
               click({ appendBlock, editor }) {
                 const setImage = (item: any) => {
                   if (
-                    item.is_image ||
+                    item.is_image === 1 ||
                     item.file_location.indexOf('.webp') !== -1 ||
                     item.file_location.indexOf('.bmp') !== -1 ||
                     item.file_location.indexOf('.png') !== -1 ||
@@ -44,14 +44,17 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = forwardRef(
                     item.file_location.indexOf('.svg') !== -1
                   ) {
                     // img
-                    return `![${item.file_name}](${item.logo})`;
+                    return `![${item.file_name}](${item.file_path})`;
                   } else if (
+                    item.is_image === 2 ||
                     item.file_location.indexOf('.mp4') !== -1 ||
                     item.file_location.indexOf('.ogg') !== -1 ||
                     item.file_location.indexOf('.webm') !== -1
                   ) {
-                    return `<video controls="controls" controlslist="nodownload" poster=""><source src="${
+                    return `<video controls="controls" controlslist="nodownload" poster="${
                       item.logo
+                    }"><source src="${
+                      item.file_path
                     }" type="video/${item.file_location.substr(
                       item.file_location.lastIndexOf('.') + 1,
                     )}">您的浏览器不支持 video 标签。</video>`;
@@ -60,14 +63,14 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = forwardRef(
                     item.file_location.indexOf('.wav') !== -1
                   ) {
                     return `<audio src="${
-                      item.logo
+                      item.file_path
                     }" controls="controls"><source src="${
-                      item.logo
+                      item.file_path
                     }" type="audio/${item.file_location.substr(
                       item.file_location.lastIndexOf('.') + 1,
                     )}">你的编辑器不支持 audio 标签</audio>`;
                   } else {
-                    return `[${item.file_name}](${item.logo})`;
+                    return `[${item.file_name}](${item.file_path})`;
                   }
                 };
 
@@ -114,7 +117,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = forwardRef(
             message.info(res.msg);
           } else {
             result.push({
-              url: res.data.logo,
+              url: res.data.file_path,
             });
           }
         }

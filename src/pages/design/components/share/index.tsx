@@ -89,11 +89,11 @@ const TemplateShare: React.FC<TemplateShareProps> = (props) => {
               intl.formatMessage({ id: 'setting.system.upload-success' }),
           );
           if (field === 'pc_thumb') {
-            setPcThumb(res.data.logo);
+            setPcThumb(res.data.file_path || res.data.logo);
           } else if (field === 'mobile_thumb') {
-            setMobileThumb(res.data.logo);
+            setMobileThumb(res.data.file_path || res.data.logo);
           } else {
-            previewImages.push(res.data.logo);
+            previewImages.push(res.data.file_path || res.data.logo);
             setPreviewImages(([] as string[]).concat(...previewImages));
           }
         }

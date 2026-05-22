@@ -52,8 +52,8 @@ const SettingContactFrom: React.FC<any> = () => {
     }
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
-      if (!setting.default_thumbs.includes(row.logo)) {
-        setting.default_thumbs.push(row.logo);
+      if (!setting.default_thumbs.includes(row.file_path)) {
+        setting.default_thumbs.push(row.file_path);
       }
     }
     setSetting({

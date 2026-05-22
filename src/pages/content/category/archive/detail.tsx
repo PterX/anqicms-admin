@@ -225,13 +225,13 @@ const ArchiveCategoryDetail: React.FC = () => {
     for (const row of rows) {
       let exists = false;
       for (let i in categoryImages) {
-        if (categoryImages[i] === row.logo) {
+        if (categoryImages[i] === row.file_path) {
           exists = true;
           break;
         }
       }
       if (!exists) {
-        categoryImages.push(row.logo);
+        categoryImages.push(row.file_path);
       }
     }
     setCategoryImages([].concat(categoryImages));
@@ -247,7 +247,7 @@ const ArchiveCategoryDetail: React.FC = () => {
   };
 
   const handleSelectLogo = (row: any) => {
-    setCategoryLogo(row.logo);
+    setCategoryLogo(row.file_path);
     message.success(
       intl.formatMessage({ id: 'setting.system.upload-success' }),
     );
@@ -279,12 +279,12 @@ const ArchiveCategoryDetail: React.FC = () => {
 
   const handleUploadExtraField = (field: string, row: any) => {
     const extra: any = {};
-    extra[field] = row.logo;
+    extra[field] = row.file_path;
     formRef.current?.setFieldsValue({ extra });
     if (!category.extra[field]) {
       category.extra[field] = null;
     }
-    category.extra[field] = row.logo;
+    category.extra[field] = row.file_path;
 
     setCategory((prev: any) => ({
       ...prev,
@@ -343,13 +343,13 @@ const ArchiveCategoryDetail: React.FC = () => {
     for (const row of rows) {
       let exists = false;
       for (const i in category.extra[field]) {
-        if (category.extra[field][i] === row.logo) {
+        if (category.extra[field][i] === row.file_path) {
           exists = true;
           break;
         }
       }
       if (!exists) {
-        category.extra[field].push(row.logo);
+        category.extra[field].push(row.file_path);
       }
     }
     const extra: any = {};
@@ -633,9 +633,11 @@ const ArchiveCategoryDetail: React.FC = () => {
                       title: cat.title,
                       label: (
                         <div title={cat.title}>
-                          {cat.parent_titles?.length > 0 ? (
+                          {cat.parents?.length > 0 ? (
                             <span className="text-muted">
-                              {cat.parent_titles?.join(' > ')}
+                              {cat.parents
+                                .map((parent: any) => parent.title)
+                                .join(' > ')}
                               {' > '}
                             </span>
                           ) : (
@@ -1144,9 +1146,14 @@ const ArchiveCategoryDetail: React.FC = () => {
                                         title: cat.title,
                                         label: (
                                           <div title={cat.title}>
-                                            {cat.parent_titles?.length > 0 ? (
+                                            {cat.parents?.length > 0 ? (
                                               <span className="text-muted">
-                                                {cat.parent_titles?.join(' > ')}
+                                                {cat.parents
+                                                  ?.map(
+                                                    (parent: any) =>
+                                                      parent.title,
+                                                  )
+                                                  .join(' > ')}
                                                 {' > '}
                                               </span>
                                             ) : (

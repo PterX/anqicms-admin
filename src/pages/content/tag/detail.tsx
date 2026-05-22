@@ -143,7 +143,7 @@ const ArchiveTagDetail: React.FC = () => {
   };
 
   const handleSelectLogo = (row: any) => {
-    setTagLogo(row.logo);
+    setTagLogo(row.file_path);
     message.success(
       intl.formatMessage({ id: 'setting.system.upload-success' }),
     );
@@ -204,12 +204,12 @@ const ArchiveTagDetail: React.FC = () => {
 
   const handleUploadExtraField = (field: string, row: any) => {
     const extra: any = {};
-    extra[field] = row.logo;
+    extra[field] = row.file_path;
     formRef.current?.setFieldsValue({ extra });
     if (!tag.extra[field]) {
       tag.extra[field] = null;
     }
-    tag.extra[field] = row.logo;
+    tag.extra[field] = row.file_path;
 
     setTag((prev: any) => ({
       ...prev,
@@ -241,13 +241,13 @@ const ArchiveTagDetail: React.FC = () => {
     for (const row of rows) {
       let exists = false;
       for (const i in tag.extra[field]) {
-        if (tag.extra[field][i] === row.logo) {
+        if (tag.extra[field][i] === row.file_path) {
           exists = true;
           break;
         }
       }
       if (!exists) {
-        tag.extra[field].push(row.logo);
+        tag.extra[field].push(row.file_path);
       }
     }
     const extra: any = {};
@@ -953,9 +953,14 @@ const ArchiveTagDetail: React.FC = () => {
                                         title: cat.title,
                                         label: (
                                           <div title={cat.title}>
-                                            {cat.parent_titles?.length > 0 ? (
+                                            {cat.parents?.length > 0 ? (
                                               <span className="text-muted">
-                                                {cat.parent_titles?.join(' > ')}
+                                                {cat.parents
+                                                  ?.map(
+                                                    (parent: any) =>
+                                                      parent.title,
+                                                  )
+                                                  .join(' > ')}
                                                 {' > '}
                                               </span>
                                             ) : (
@@ -1113,9 +1118,11 @@ const ArchiveTagDetail: React.FC = () => {
                         title: cat.title,
                         label: (
                           <div title={cat.title}>
-                            {cat.parent_titles?.length > 0 ? (
+                            {cat.parents?.length > 0 ? (
                               <span className="text-muted">
-                                {cat.parent_titles?.join(' > ')}
+                                {cat.parents
+                                  ?.map((parent: any) => parent.title)
+                                  .join(' > ')}
                                 {' > '}
                               </span>
                             ) : (

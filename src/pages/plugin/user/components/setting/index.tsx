@@ -88,17 +88,28 @@ const UserFieldSetting: React.FC<UserFieldSettingProps> = (props) => {
   };
 
   const handleSaveSetting = async () => {
-    const res = await pluginSaveUserFieldsSetting(setting);
-
-    if (res.code === 0) {
-      message.success(res.msg);
-      setEditVisible(false);
-      if (actionRef.current) {
-        actionRef.current.reload();
-      }
-    } else {
-      message.error(res.msg);
+    if (loading) {
+      return;
     }
+    setLoading(true);
+    const hide = message.loading('loading', 0);
+
+    pluginSaveUserFieldsSetting(setting)
+      .then((res) => {
+        if (res.code === 0) {
+          message.success(res.msg);
+          setEditVisible(false);
+          if (actionRef.current) {
+            actionRef.current.reload();
+          }
+        } else {
+          message.error(res.msg);
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+        hide();
+      });
   };
 
   const columns: ProColumns<any>[] = [

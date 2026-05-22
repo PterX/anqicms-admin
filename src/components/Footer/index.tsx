@@ -7,8 +7,9 @@ import {
   ProFormTextArea,
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
-import { Alert, Button, Modal, Upload, message } from 'antd';
+import { Alert, Upload, message } from 'antd';
 import { useState } from 'react';
+import AiChat from '../aiChat';
 import './index.less';
 
 let loading = false;
@@ -63,7 +64,7 @@ const Footer: React.FC = () => {
           message.info(
             res.msg || intl.formatMessage({ id: 'component.footer.uploaded' }),
           );
-          images.push(res.data.logo);
+          images.push(res.data.file_path);
           setImages(([] as string[]).concat(...images));
         }
       })
@@ -123,20 +124,7 @@ const Footer: React.FC = () => {
           ></path>
         </svg>
       </div>
-      <Modal
-        open={aiChatVisible}
-        onCancel={() => setAiChatVisible(false)}
-        title={intl.formatMessage({ id: 'component.ai-chat.title' })}
-        footer={[
-          <Button key="close" onClick={() => setAiChatVisible(false)}>
-            <FormattedMessage id="component.close" />
-          </Button>,
-        ]}
-      >
-        <div style={{ textAlign: 'center', padding: '20px 0' }}>
-          <p>{intl.formatMessage({ id: 'component.ai-chat.tips' })}</p>
-        </div>
-      </Modal>
+      <AiChat visible={aiChatVisible} onClose={() => setAiChatVisible(false)} />
       <ModalForm
         open={visible}
         width={600}

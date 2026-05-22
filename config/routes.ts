@@ -450,7 +450,7 @@ export default [
   {
     path: '/design',
     name: 'design',
-    icon: 'Code',
+    icon: 'Layout',
     access: 'canAdmin',
     routes: [
       {

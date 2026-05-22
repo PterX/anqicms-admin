@@ -33,14 +33,14 @@ const SettingContactFrom: React.FC<any> = () => {
     getSetting();
   }, []);
 
-  const handleSelectLogo = (row: any) => {
-    setQrcode(row.logo);
+  const handleSelectQrcode = (row: any) => {
+    setQrcode(row.file_path);
     message.success(
       intl.formatMessage({ id: 'setting.system.upload-success' }),
     );
   };
 
-  const handleRemoveLogo = (e: any) => {
+  const handleRemoveQrcode = (e: any) => {
     e.stopPropagation();
     Modal.confirm({
       title: intl.formatMessage({ id: 'setting.system.confirm-delete' }),
@@ -107,12 +107,12 @@ const SettingContactFrom: React.FC<any> = () => {
               label={intl.formatMessage({ id: 'setting.contact.qrcode' })}
               width="lg"
             >
-              <AttachmentSelect onSelect={handleSelectLogo} open={false}>
+              <AttachmentSelect onSelect={handleSelectQrcode} open={false}>
                 <div className="ant-upload-item">
                   {qrcode ? (
                     <>
                       <img src={qrcode} style={{ width: '100%' }} />
-                      <a className="delete" onClick={handleRemoveLogo}>
+                      <a className="delete" onClick={handleRemoveQrcode}>
                         <FormattedMessage id="setting.system.delete" />
                       </a>
                     </>

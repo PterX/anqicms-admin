@@ -128,13 +128,13 @@ const PageCategoryDetail: React.FC = () => {
       let exists = false;
 
       for (let i in categoryImages) {
-        if (categoryImages[i] === row.logo) {
+        if (categoryImages[i] === row.file_path) {
           exists = true;
           break;
         }
       }
       if (!exists) {
-        categoryImages.push(row.logo);
+        categoryImages.push(row.file_path);
       }
     }
     setCategoryImages([].concat(categoryImages));
@@ -150,7 +150,7 @@ const PageCategoryDetail: React.FC = () => {
   };
 
   const handleSelectLogo = (row: any) => {
-    setCategoryLogo(row.logo);
+    setCategoryLogo(row.file_path);
     message.success(
       intl.formatMessage({ id: 'setting.system.upload-success' }),
     );
