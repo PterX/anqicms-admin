@@ -39,7 +39,6 @@ import {
   Button,
   Dropdown,
   Input,
-  Menu,
   Modal,
   Select,
   Space,
@@ -816,65 +815,80 @@ const ArchiveList: React.FC = () => {
           </a>
 
           <Dropdown
-            overlay={
-              <Menu>
-                <Menu.Item>
-                  <a
-                    onClick={() => {
-                      handleTranslateArchive(record);
-                    }}
-                    title={intl.formatMessage({
-                      id: 'content.action.translate.tips',
-                    })}
-                  >
-                    <FormattedMessage id="content.action.translate" />
-                  </a>
-                </Menu.Item>
-                <Menu.Item>
-                  <a
-                    onClick={() => {
-                      handleAiPseudoArchive(record);
-                    }}
-                    title={intl.formatMessage({
-                      id: 'content.action.aipseudo.tips',
-                    })}
-                  >
-                    <FormattedMessage id="content.action.aipseudo" />
-                  </a>
-                </Menu.Item>
-                <Menu.Item>
-                  <a
-                    onClick={() => {
-                      handleShowChildren(record);
-                    }}
-                  >
-                    <FormattedMessage id="content.children.btn" />
-                  </a>
-                </Menu.Item>
-                <Menu.Item>
-                  <a
-                    onClick={() => {
-                      handleCopyArchive(record);
-                    }}
-                    title={intl.formatMessage({
-                      id: 'content.action.copy.tips',
-                    })}
-                  >
-                    <FormattedMessage id="content.action.copy" />
-                  </a>
-                </Menu.Item>
-                <Menu.Item danger>
-                  <a
-                    className="text-red"
-                    onClick={async () => {
-                      await handleRemove([record.id]);
-                    }}
-                  >
-                    <FormattedMessage id="setting.system.delete" />
-                  </a>
-                </Menu.Item>
-              </Menu>
-            }
+            menu={{
+              items: [
+                {
+                  key: '1',
+                  label: (
+                    <a
+                      onClick={() => {
+                        handleTranslateArchive(record);
+                      }}
+                      title={intl.formatMessage({
+                        id: 'content.action.translate.tips',
+                      })}
+                    >
+                      <FormattedMessage id="content.action.translate" />
+                    </a>
+                  ),
+                },
+                {
+                  key: '2',
+                  label: (
+                    <a
+                      onClick={() => {
+                        handleAiPseudoArchive(record);
+                      }}
+                      title={intl.formatMessage({
+                        id: 'content.action.aipseudo.tips',
+                      })}
+                    >
+                      <FormattedMessage id="content.action.aipseudo" />
+                    </a>
+                  ),
+                },
+                {
+                  key: '3',
+                  label: (
+                    <a
+                      onClick={() => {
+                        handleShowChildren(record);
+                      }}
+                    >
+                      <FormattedMessage id="content.children.btn" />
+                    </a>
+                  ),
+                },
+                {
+                  key: '4',
+                  label: (
+                    <a
+                      onClick={() => {
+                        handleCopyArchive(record);
+                      }}
+                      title={intl.formatMessage({
+                        id: 'content.action.copy.tips',
+                      })}
+                    >
+                      <FormattedMessage id="content.action.copy" />
+                    </a>
+                  ),
+                },
+                {
+                  key: '5',
+                  label: (
+                    <a
+                      className="text-red"
+                      onClick={async () => {
+                        await handleRemove([record.id]);
+                      }}
+                    >
+                      <FormattedMessage id="setting.system.delete" />
+                    </a>
+                  ),
+                },
+              ],
+            }}
             key="more"
           >
             <a>

@@ -122,6 +122,7 @@ export default {
   'component.right-content.expire-time': 'VIP有效期：',
   'component.right-content.remain': 'AI写作剩余额度：',
   'component.right-content.remain.suffix': '篇/天',
+  'component.right-content.vip-title': 'VIP会员',
   'component.right-content.vip-tips':
     '您尚未成为VIP会员，部分软件功能将受限。购买会员可以使用更丰富的安企盒子和安企CMS功能。',
   'component.right-content.download-prefix':

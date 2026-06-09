@@ -1,3 +1,4 @@
+import { useVipModal } from '@/components/vipModal';
 import {
   collectAiGenerateArticle,
   collectCollectorArticle,
@@ -24,6 +25,7 @@ import KeywordForm from './components/keywordForm';
 import KeywordSetting from './components/setting';
 
 const PluginKeyword: React.FC = () => {
+  const { checkVip, VipModal } = useVipModal();
   const actionRef = useRef<ActionType>();
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
   const [currentKeyword, setCurrentKeyword] = useState<any>({});
@@ -75,8 +77,10 @@ const PluginKeyword: React.FC = () => {
   };
 
   const handleDigKeyword = async () => {
-    let res = await digCollectorKeyword();
-    message.info(res.msg);
+    checkVip(async () => {
+      let res = await digCollectorKeyword();
+      message.info(res.msg);
+    });
   };
 
   const handleCollectArticle = (keyword: any) => {
@@ -326,6 +330,7 @@ const PluginKeyword: React.FC = () => {
           }}
         />
       )}
+      <VipModal />
     </PageContainer>
   );
 };

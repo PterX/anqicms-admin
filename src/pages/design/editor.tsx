@@ -25,6 +25,7 @@ import {
   Popover,
   Row,
   Space,
+  Tabs,
   Tree,
   message,
 } from 'antd';
@@ -36,6 +37,20 @@ import './index.less';
 
 let fileType: string = '';
 let helperEvent: any;
+
+interface TabItem {
+  key: string;
+  path: string;
+  type: string;
+  label: string;
+}
+
+interface TabData {
+  code: string;
+  loaded: boolean;
+  fileInfo: any;
+  unsave: boolean;
+}
 
 const DesignEditor: React.FC = () => {
   const [fileInfo, setFileInfo] = useState<any>({});
@@ -56,13 +71,45 @@ const DesignEditor: React.FC = () => {
   const [addCodeVisible, setAddCodeVisible] = useState<boolean>(false);
   const [addCode, setAddCode] = useState<any>({});
   const [codeValue, setCodeValue] = useState<string>('');
+  const [tabs, setTabs] = useState<TabItem[]>([]);
+  const [activeTab, setActiveTab] = useState<string>('');
+  const [renderTick, setRenderTick] = useState(0);
+  const tabDataRef = useRef<Record<string, TabData>>({});
   const intl = useIntl();
 
-  let unsave = false;
+  const forceRender = () => setRenderTick((t) => t + 1);
 
-  const fetchDesignFileInfo = async (path: any) => {
+  const saveActiveTabData = () => {
+    if (activeTab && tabDataRef.current[activeTab]) {
+      tabDataRef.current[activeTab].code = code;
+      tabDataRef.current[activeTab].loaded = loaded;
+      tabDataRef.current[activeTab].fileInfo = { ...fileInfo };
+      tabDataRef.current[activeTab].unsave =
+        tabDataRef.current[activeTab].unsave || false;
+    }
+  };
+
+  const restoreActiveTabData = (key: string) => {
+    const data = tabDataRef.current[key];
+    if (data) {
+      setCode(data.code);
+      setFileInfo({ ...data.fileInfo });
+      setLoaded(data.loaded);
+    } else {
+      setCode('');
+      setFileInfo({});
+      setLoaded(false);
+    }
+  };
+
+  const fetchDesignFileInfo = async (path: any, tabKey?: string) => {
     const searchParams = new URLSearchParams(window.location.search);
     const packageName = searchParams.get('package') || '';
+    const key = tabKey || path;
+    // Mark tab as loading
+    if (tabDataRef.current[key]) {
+      tabDataRef.current[key].loaded = false;
+    }
     setLoaded(false);
     getDesignFileInfo({
       package: packageName,
@@ -73,6 +120,14 @@ const DesignEditor: React.FC = () => {
         setFileInfo(res.data);
         setCode(res.data.content || '');
         setLoaded(true);
+        // Store in tab data (always store when tabKey is provided)
+        tabDataRef.current[key] = {
+          code: res.data.content || '',
+          loaded: true,
+          fileInfo: { ...res.data },
+          unsave: false,
+        };
+        forceRender();
         actionRef.current?.reload();
       })
       .catch(() => {
@@ -253,7 +308,13 @@ const DesignEditor: React.FC = () => {
         }
         setStaticFiles(statics);
 
-        fetchDesignFileInfo(path);
+        // Open initial file as first tab
+        const label = path.split('/').pop() || path;
+        const tabKey = path;
+        setTabs([{ key: tabKey, path, type, label }]);
+        setActiveTab(tabKey);
+        fileType = type;
+        fetchDesignFileInfo(path, tabKey);
       })
       .catch(() => {
         message.error(intl.formatMessage({ id: 'design.editor.get.error' }));
@@ -314,7 +375,11 @@ const DesignEditor: React.FC = () => {
   const onChangeCode = (newCode: string) => {
     if (code !== newCode) {
       setCode(newCode);
-      unsave = true;
+      if (activeTab && tabDataRef.current[activeTab]) {
+        tabDataRef.current[activeTab].unsave = true;
+        tabDataRef.current[activeTab].code = newCode;
+        forceRender();
+      }
     }
   };
 
@@ -323,7 +388,11 @@ const DesignEditor: React.FC = () => {
     fileInfo.package = designInfo.package;
     fileInfo.update_content = true;
     fileInfo.type = fileType;
-    unsave = false;
+    // Update tab data
+    if (activeTab && tabDataRef.current[activeTab]) {
+      tabDataRef.current[activeTab].unsave = false;
+      forceRender();
+    }
     const hide = message.loading(
       intl.formatMessage({ id: 'setting.system.submitting' }),
       0,
@@ -331,6 +400,10 @@ const DesignEditor: React.FC = () => {
     saveDesignFileInfo(fileInfo)
       .then((res) => {
         message.info(res.msg);
+        // Update tab data loaded status
+        if (activeTab && tabDataRef.current[activeTab]) {
+          tabDataRef.current[activeTab].fileInfo = { ...fileInfo };
+        }
         actionRef.current?.reload();
       })
       .finally(() => {
@@ -342,23 +415,109 @@ const DesignEditor: React.FC = () => {
     window.scrollTo(window.pageXOffset, 0);
   };
 
+  const openNewTab = (type: string, info: any, key: string) => {
+    // Save current tab data
+    saveActiveTabData();
+    // Add new tab
+    const label = info.path.split('/').pop() || info.path;
+    setTabs((prev) => [...prev, { key, path: info.path, type, label }]);
+    setActiveTab(key);
+    fileType = type;
+    fetchDesignFileInfo(info.path, key);
+    scrollToTop();
+  };
+
+  const handleTabChange = (key: string) => {
+    if (key === activeTab) return;
+    // Save current tab data
+    saveActiveTabData();
+    // Switch to new tab
+    setActiveTab(key);
+    const tab = tabs.find((t) => t.key === key);
+    if (tab) {
+      fileType = tab.type;
+      restoreActiveTabData(key);
+      scrollToTop();
+    }
+  };
+
   const handleEditFile = (type: string, info: any) => {
-    if (unsave) {
+    const key = info.path;
+    // Check if tab already open
+    const existingIndex = tabs.findIndex((t) => t.key === key);
+    if (existingIndex !== -1) {
+      // Tab already open, switch to it
+      handleTabChange(key);
+      scrollToTop();
+      return;
+    }
+
+    // Check if current tab has unsaved changes
+    const currentTabData = activeTab ? tabDataRef.current[activeTab] : null;
+    if (currentTabData?.unsave) {
       Modal.confirm({
         title: intl.formatMessage({ id: 'design.editor.confirm-giveup' }),
         content: intl.formatMessage({
           id: 'design.editor.confirm-giveup.content',
         }),
         onOk: () => {
-          fileType = type;
-          fetchDesignFileInfo(info.path);
-          scrollToTop();
+          openNewTab(type, info, key);
         },
       });
     } else {
-      fileType = type;
-      fetchDesignFileInfo(info.path);
-      scrollToTop();
+      openNewTab(type, info, key);
+    }
+  };
+
+  const doRemoveTab = (targetKey: string) => {
+    const remainingTabs = tabs.filter((t) => t.key !== targetKey);
+    // Clean up tab data
+    delete tabDataRef.current[targetKey];
+
+    if (remainingTabs.length === 0) {
+      setTabs([]);
+      setActiveTab('');
+      setCode('');
+      setFileInfo({});
+      setLoaded(false);
+      return;
+    }
+
+    // Determine next active tab
+    let nextKey = activeTab;
+    if (targetKey === activeTab) {
+      const removedIndex = tabs.findIndex((t) => t.key === targetKey);
+      const nextTab =
+        remainingTabs[Math.min(removedIndex, remainingTabs.length - 1)];
+      nextKey = nextTab.key;
+    }
+
+    setTabs(remainingTabs);
+    setActiveTab(nextKey);
+    const nextTab = remainingTabs.find((t) => t.key === nextKey);
+    if (nextTab) {
+      fileType = nextTab.type;
+      restoreActiveTabData(nextKey);
+    }
+  };
+
+  const handleTabRemove = (targetKey: string) => {
+    const tab = tabs.find((t) => t.key === targetKey);
+    if (!tab) return;
+
+    const tabData = tabDataRef.current[targetKey];
+    if (tabData?.unsave) {
+      Modal.confirm({
+        title: intl.formatMessage({ id: 'design.editor.confirm-giveup' }),
+        content: intl.formatMessage({
+          id: 'design.editor.confirm-giveup.content',
+        }),
+        onOk: () => {
+          doRemoveTab(targetKey);
+        },
+      });
+    } else {
+      doRemoveTab(targetKey);
     }
   };
 
@@ -397,7 +556,7 @@ const DesignEditor: React.FC = () => {
         })
           .then((res) => {
             message.info(res.msg);
-            fetchDesignFileInfo(info.path);
+            fetchDesignFileInfo(info.path, activeTab);
           })
           .finally(() => {
             hide();
@@ -441,7 +600,8 @@ const DesignEditor: React.FC = () => {
   };
 
   const handleGoBack = () => {
-    if (unsave) {
+    const currentTabData = activeTab ? tabDataRef.current[activeTab] : null;
+    if (currentTabData?.unsave) {
       Modal.confirm({
         title: intl.formatMessage({ id: 'design.editor.confirm-goback' }),
         content: intl.formatMessage({
@@ -564,13 +724,40 @@ const DesignEditor: React.FC = () => {
     <PageContainer
       title={
         <div>
-          <FormattedMessage id="design.editing" />: {fileInfo?.path}
+          <FormattedMessage id="design.editing" />:{' '}
+          {activeTab
+            ? tabs.find((t) => t.key === activeTab)?.path || fileInfo?.path
+            : fileInfo?.path}
         </div>
       }
     >
       <Card className="design-editor-card">
         <Row gutter={16}>
           <Col sm={18} xs={24}>
+            {tabs.length > 0 && (
+              <Tabs
+                type="editable-card"
+                hideAdd
+                activeKey={activeTab}
+                onChange={handleTabChange}
+                onEdit={(targetKey) => handleTabRemove(targetKey as string)}
+                size="small"
+                items={tabs.map((tab) => ({
+                  key: tab.key,
+                  label: (
+                    <span>
+                      {tab.label}
+                      {tabDataRef.current[tab.key]?.unsave && (
+                        <span style={{ color: '#ff4d4f', marginLeft: 2 }}>
+                          *
+                        </span>
+                      )}
+                    </span>
+                  ),
+                }))}
+                style={{ marginBottom: 8 }}
+              />
+            )}
             <div className="code-editor-box" onKeyDown={handleKeyDown}>
               {loaded && (
                 <MonacoEditor

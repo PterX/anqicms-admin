@@ -1,10 +1,12 @@
 import NewContainer from '@/components/NewContainer';
+import { useVipModal } from '@/components/vipModal';
 import {
   pluginGetTitleImageConfig,
   pluginSaveTitleImageConfig,
   pluginTitleImagePreview,
   pluginTitleImageUploadFile,
 } from '@/services';
+import { PlusOutlined } from '@ant-design/icons';
 import {
   ModalForm,
   ProForm,
@@ -28,9 +30,9 @@ import {
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import './index.less';
-import { PlusOutlined } from '@ant-design/icons';
 
 const PluginTitleImage: React.FC<any> = () => {
+  const { isVip, checkVip, VipModal } = useVipModal();
   const { initialState, setInitialState } = useModel('@@initialState');
   const [setting, setSetting] = useState<any>(null);
   const [fetched, setFetched] = useState<boolean>(false);
@@ -101,8 +103,8 @@ const PluginTitleImage: React.FC<any> = () => {
     pluginTitleImageUploadFile(formData)
       .then((res) => {
         message.success(res.msg);
-        if (field === 'bg_image'){
-          if(!setting.bg_images) {
+        if (field === 'bg_image') {
+          if (!setting.bg_images) {
             setting.bg_images = [];
           }
           setting.bg_images.push(res.data);
@@ -121,7 +123,7 @@ const PluginTitleImage: React.FC<any> = () => {
     Modal.confirm({
       title: intl.formatMessage({ id: 'setting.system.confirm-delete' }),
       onOk: async () => {
-        setting.bg_images.splice(index, 1)
+        setting.bg_images.splice(index, 1);
         setSetting(Object.assign({}, setting));
         getPreviewData();
       },
@@ -156,7 +158,7 @@ const PluginTitleImage: React.FC<any> = () => {
     setting.font_bg_color = '';
     setSetting(Object.assign({}, setting));
     getPreviewData();
-  }
+  };
 
   const confirmChangeText = async (values: any) => {
     previewText = values.text;
@@ -199,7 +201,18 @@ const PluginTitleImage: React.FC<any> = () => {
                   extra={intl.formatMessage({
                     id: 'plugin.titleimage.open.description',
                   })}
+                  disabled={isVip === false}
                 />
+                {!isVip ? (
+                  <div
+                    className="link"
+                    onClick={() => {
+                      checkVip(() => {});
+                    }}
+                  >
+                    更多存储方式为VIP功能，点击查看VIP
+                  </div>
+                ) : null}
                 <div style={{ display: setting.open ? 'block' : 'none' }}>
                   <ProFormRadio.Group
                     name="draw_sub"
@@ -280,17 +293,17 @@ const PluginTitleImage: React.FC<any> = () => {
                       id: 'plugin.titleimage.color_bg.default',
                     })}
                   >
-                    <Space align='center' size={16}>
-                    <ColorPicker
-                      key="2"
-                      showText
-                      value={setting.font_bg_color}
-                      onChange={(e) => {
-                        onChangeBgColor(e.toHex());
-                      }}
-                      allowClear
-                      onClear={() => cleanFontBgColor()}
-                    />
+                    <Space align="center" size={16}>
+                      <ColorPicker
+                        key="2"
+                        showText
+                        value={setting.font_bg_color}
+                        onChange={(e) => {
+                          onChangeBgColor(e.toHex());
+                        }}
+                        allowClear
+                        onClear={() => cleanFontBgColor()}
+                      />
                     </Space>
                   </ProFormText>
                   <ProFormDigit
@@ -346,7 +359,11 @@ const PluginTitleImage: React.FC<any> = () => {
                                   <Image
                                     className="img"
                                     preview={true}
-                                    src={(initialState?.system?.base_url || '') + '/' + item}
+                                    src={
+                                      (initialState?.system?.base_url || '') +
+                                      '/' +
+                                      item
+                                    }
                                   />
                                   <span
                                     className="close"
@@ -446,6 +463,7 @@ const PluginTitleImage: React.FC<any> = () => {
           <ProFormText name="text" />
         </ModalForm>
       )}
+      <VipModal />
     </NewContainer>
   );
 };

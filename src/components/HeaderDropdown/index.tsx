@@ -1,17 +1,32 @@
+import { Dropdown, MenuProps } from 'antd';
 import type { DropDownProps } from 'antd/es/dropdown';
-import { Dropdown } from 'antd';
-import React from 'react';
 import classNames from 'classnames';
+import type { MenuProps as RcMenuProps } from 'rc-menu';
+import React from 'react';
 import styles from './index.less';
 
 export type HeaderDropdownProps = {
   overlayClassName?: string;
-  overlay: React.ReactNode | (() => React.ReactNode) | any;
-  placement?: 'bottomLeft' | 'bottomRight' | 'topLeft' | 'topCenter' | 'topRight' | 'bottomCenter';
+  placement?:
+    | 'bottomLeft'
+    | 'bottomRight'
+    | 'topLeft'
+    | 'topCenter'
+    | 'topRight'
+    | 'bottomCenter';
+  menu?: MenuProps & {
+    activeKey?: RcMenuProps['activeKey'];
+  };
 } & Omit<DropDownProps, 'overlay'>;
 
-const HeaderDropdown: React.FC<HeaderDropdownProps> = ({ overlayClassName: cls, ...restProps }) => (
-  <Dropdown overlayClassName={classNames(styles.container, cls)} {...restProps} />
+const HeaderDropdown: React.FC<HeaderDropdownProps> = ({
+  overlayClassName: cls,
+  ...restProps
+}) => (
+  <Dropdown
+    overlayClassName={classNames(styles.container, cls)}
+    {...restProps}
+  />
 );
 
 export default HeaderDropdown;

@@ -132,6 +132,7 @@ export default {
   'component.right-content.expire-time': 'VIP validity period:',
   'component.right-content.remain': 'AI writing remaining quota:',
   'component.right-content.remain.suffix': 'articles/day',
+  'component.right-content.vip-title': 'VIP Member',
   'component.right-content.vip-tips':
     'If you have not become a VIP member, some software functions will be limited. By purchasing a membership, you can use richer Anqi Box and Anqi CMS functions.',
   'component.right-content.download-prefix':

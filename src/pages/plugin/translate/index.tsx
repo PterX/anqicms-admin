@@ -1,3 +1,4 @@
+import { useVipModal } from '@/components/vipModal';
 import {
   pluginGetTranslateConfig,
   pluginSaveTranslateConfig,
@@ -18,6 +19,7 @@ import dayjs from 'dayjs';
 import React, { useEffect, useRef, useState } from 'react';
 
 const PluginTranslate: React.FC<any> = () => {
+  const { isVip, checkVip, VipModal } = useVipModal();
   const actionRef = useRef<ActionType>();
   const [setting, setSetting] = useState<any>({});
   const [fetched, setFetched] = useState<boolean>(false);
@@ -149,6 +151,19 @@ const PluginTranslate: React.FC<any> = () => {
                     value: 'deepl',
                   },
                 ]}
+                disabled={isVip === false}
+                extra={
+                  !isVip ? (
+                    <div
+                      className="link"
+                      onClick={() => {
+                        checkVip(() => {});
+                      }}
+                    >
+                      更多翻译接口为VIP功能，点击查看VIP
+                    </div>
+                  ) : null
+                }
               />
               {engine === 'baidu' && (
                 <Card
@@ -268,6 +283,7 @@ const PluginTranslate: React.FC<any> = () => {
           }}
         />
       </Modal>
+      <VipModal />
     </PageContainer>
   );
 };

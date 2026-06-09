@@ -1,7 +1,13 @@
 import { removeStore } from '@/utils/store';
-import { GroupOutlined, LogoutOutlined, ProfileOutlined, UserOutlined } from '@ant-design/icons';
+import {
+  GroupOutlined,
+  LogoutOutlined,
+  ProfileOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import { FormattedMessage, history, useModel } from '@umijs/max';
-import { Menu, Spin } from 'antd';
+import { MenuProps, Spin } from 'antd';
+import { Divider } from 'rc-menu';
 import type { MenuInfo } from 'rc-menu/lib/interface';
 import React, { useCallback } from 'react';
 import HeaderDropdown from '../HeaderDropdown';
@@ -56,32 +62,59 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
     return loading;
   }
 
-  const menuHeaderDropdown = (
-    <Menu className="menu" selectedKeys={[]} onClick={onMenuClick}>
-      {menu && (
-        <Menu.Item key="">
-          <UserOutlined />
-          <FormattedMessage id="component.right-content.admin-info" />
-        </Menu.Item>
-      )}
-      <Menu.Item key="logs/login">
-        <GroupOutlined />
-        <FormattedMessage id="component.right-content.login-log" />
-      </Menu.Item>
-      <Menu.Item key="logs/action">
-        <ProfileOutlined />
-        <FormattedMessage id="component.right-content.action-log" />
-      </Menu.Item>
-      {menu && <Menu.Divider />}
-
-      <Menu.Item key="logout">
-        <LogoutOutlined />
-        <FormattedMessage id="component.right-content.logout" />
-      </Menu.Item>
-    </Menu>
-  );
+  const menuHeaderDropdown: MenuProps = {
+    onClick: onMenuClick,
+    items: [
+      menu
+        ? {
+            key: 'info',
+            label: (
+              <div>
+                <UserOutlined />{' '}
+                <FormattedMessage id="component.right-content.admin-info" />
+              </div>
+            ),
+          }
+        : null,
+      {
+        key: 'logs/login',
+        label: (
+          <div>
+            <GroupOutlined />{' '}
+            <FormattedMessage id="component.right-content.login-log" />
+          </div>
+        ),
+      },
+      {
+        key: 'logs/action',
+        label: (
+          <div>
+            <ProfileOutlined />{' '}
+            <FormattedMessage id="component.right-content.action-log" />
+          </div>
+        ),
+      },
+      {
+        key: 'fivider',
+        label: (
+          <div>
+            <Divider />
+          </div>
+        ),
+      },
+      {
+        key: 'logout',
+        label: (
+          <div>
+            <LogoutOutlined />{' '}
+            <FormattedMessage id="component.right-content.logout" />
+          </div>
+        ),
+      },
+    ],
+  };
   return (
-    <HeaderDropdown overlay={menuHeaderDropdown}>
+    <HeaderDropdown menu={menuHeaderDropdown}>
       <span className={`action account`}>
         <span className={`name anticon`}>{currentUser.user_name}</span>
       </span>

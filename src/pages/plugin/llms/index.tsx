@@ -1,4 +1,5 @@
 import NewContainer from '@/components/NewContainer';
+import { useVipModal } from '@/components/vipModal';
 import {
   getCategories,
   getModules,
@@ -23,6 +24,7 @@ import React, { useEffect, useState } from 'react';
 
 let intervalXhr: any = null;
 const PluginLLMs: React.FC<any> = () => {
+  const { isVip, checkVip, VipModal } = useVipModal();
   const formRef = React.createRef<ProFormInstance>();
   const [setting, setSetting] = useState<any>({});
   const [fetched, setFetched] = useState<boolean>(false);
@@ -112,7 +114,19 @@ const PluginLLMs: React.FC<any> = () => {
           className="mb-normal"
           message={
             <div>
-              <FormattedMessage id="plugin.llms.description" />
+              <div>
+                <FormattedMessage id="plugin.llms.description" />
+              </div>
+              {!isVip ? (
+                <div
+                  className="link mt-normal"
+                  onClick={() => {
+                    checkVip(() => {}, '更多的LLMs设置为VIP功能');
+                  }}
+                >
+                  更多的LLMs设置为VIP功能，点击查看VIP
+                </div>
+              ) : null}
             </div>
           }
         />
@@ -318,6 +332,18 @@ const PluginLLMs: React.FC<any> = () => {
                     title={intl.formatMessage({
                       id: 'plugin.llms.extra-setting',
                     })}
+                    extra={
+                      !isVip ? (
+                        <div
+                          className="link"
+                          onClick={() => {
+                            checkVip(() => {}, '更多的LLMs设置为VIP功能');
+                          }}
+                        >
+                          点击查看VIP
+                        </div>
+                      ) : null
+                    }
                   >
                     <ProFormTextArea
                       name="llms_title"
@@ -325,6 +351,7 @@ const PluginLLMs: React.FC<any> = () => {
                       extra={intl.formatMessage({
                         id: 'plugin.llms.title.description',
                       })}
+                      disabled={isVip === false}
                     />
                     <ProFormTextArea
                       name="llms_description"
@@ -334,6 +361,7 @@ const PluginLLMs: React.FC<any> = () => {
                       extra={intl.formatMessage({
                         id: 'plugin.llms.description.description',
                       })}
+                      disabled={isVip === false}
                     />
                     <ProFormTextArea
                       name="llms_after_description"
@@ -343,6 +371,7 @@ const PluginLLMs: React.FC<any> = () => {
                       extra={intl.formatMessage({
                         id: 'plugin.llms.after-description.description',
                       })}
+                      disabled={isVip === false}
                     />
                     <ProFormTextArea
                       name="llms_end_description"
@@ -352,6 +381,7 @@ const PluginLLMs: React.FC<any> = () => {
                       extra={intl.formatMessage({
                         id: 'plugin.llms.end-description.description',
                       })}
+                      disabled={isVip === false}
                     />
                   </Card>
                   <Card
@@ -416,6 +446,7 @@ const PluginLLMs: React.FC<any> = () => {
           </ProForm>
         )}
       </Card>
+      <VipModal />
     </NewContainer>
   );
 };

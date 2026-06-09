@@ -1,4 +1,5 @@
 import AttachmentSelect from '@/components/attachment';
+import { useVipModal } from '@/components/vipModal';
 import WebsiteForm from '@/pages/website/components/form';
 import {
   getSubsiteAdminLoginUrl,
@@ -48,6 +49,7 @@ let running = false;
 let intXhr: any = null;
 
 const PluginMultiLang: React.FC<any> = () => {
+  const { isVip, checkVip, VipModal } = useVipModal();
   const formRef = React.createRef<ProFormInstance>();
   const actionRef = useRef<ActionType>();
   const [limiterSetting, setLimiterSetting] = useState<any>({});
@@ -58,6 +60,7 @@ const PluginMultiLang: React.FC<any> = () => {
   const [textLogVisible, setTextLogVisible] = useState<boolean>(false);
   const [cacheVisible, setCacheVisible] = useState<boolean>(false);
   const [addNewSiteVisible, setAddNewSiteVisible] = useState<boolean>(false);
+  const [multiSites, setMultiSites] = useState<any[]>([]);
   const [defaultSite, setDefaultSite] = useState<any>({});
   const [langOptions, setLangOptions] = useState<any[]>([]);
   const [siteType, setSiteType] = useState<any>('multi');
@@ -257,6 +260,18 @@ const PluginMultiLang: React.FC<any> = () => {
   const onSubmitNewSite = async () => {
     setAddNewSiteVisible(false);
     setEditVisible(true);
+  };
+
+  const handleAddSite = () => {
+    if (multiSites.length > 1) {
+      checkVip(() => {
+        setCurrentSite({});
+        setEditVisible(true);
+      }, 'VIP会员可以添加2个以上的多语言站点。');
+    } else {
+      setCurrentSite({});
+      setEditVisible(true);
+    }
   };
 
   const columns: ProColumns<any>[] = [
@@ -559,8 +574,7 @@ const PluginMultiLang: React.FC<any> = () => {
                   <Button
                     key="add"
                     onClick={() => {
-                      setCurrentSite({});
-                      setEditVisible(true);
+                      handleAddSite();
                     }}
                   >
                     <FormattedMessage id="plugin.multilang.add" />
@@ -571,6 +585,7 @@ const PluginMultiLang: React.FC<any> = () => {
               tableAlertOptionRender={false}
               request={async (params) => {
                 const res = await pluginGetMultiLangSites(params);
+                setMultiSites(res.data || []);
                 setDefaultSite(res.data?.[0] || {});
                 return res;
               }}
@@ -760,6 +775,7 @@ const PluginMultiLang: React.FC<any> = () => {
           onCancel={() => setTextLogVisible(false)}
         />
       )}
+      <VipModal />
     </PageContainer>
   );
 };

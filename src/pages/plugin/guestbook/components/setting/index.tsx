@@ -1,3 +1,5 @@
+import { useVipModal } from '@/components/vipModal';
+import { getSiteInfo, getWebsiteList } from '@/services';
 import {
   pluginGetGuestbookSetting,
   pluginSaveGuestbookSetting,
@@ -6,29 +8,38 @@ import {
   ActionType,
   ModalForm,
   ProColumns,
+  ProFormInstance,
   ProFormRadio,
+  ProFormSelect,
   ProFormText,
   ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
-import { FormattedMessage, useIntl } from '@umijs/max';
-import { Button, Col, Input, Modal, Row, Space, message } from 'antd';
+import { FormattedMessage, Link, useIntl } from '@umijs/max';
+import { Button, Modal, Space, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
+import './index.less';
 
 export type GuestbookSettingProps = {
   children?: React.ReactNode;
 };
 
 const GuestbookSetting: React.FC<GuestbookSettingProps> = (props) => {
+  const { isVip, checkVip, VipModal } = useVipModal();
+  const formRef = useRef<ProFormInstance>();
   const actionRef = useRef<ActionType>();
   const [visible, setVisible] = useState<boolean>(false);
   const [editVisible, setEditVisible] = useState<boolean>(false);
   const [currentField, setCurrentField] = useState<any>({});
   const [setting, setSetting] = useState<any>({ fields: [] });
   const [fetched, setFetched] = useState<boolean>(false);
+  const [siteInfo, setSiteInfo] = useState<any>({});
   const intl = useIntl();
 
   const getSetting = async () => {
+    getSiteInfo({}).then((res) => {
+      setSiteInfo(res?.data || {});
+    });
     const res = await pluginGetGuestbookSetting();
     let setting = res.data || { fields: [] };
     setSetting(setting);
@@ -82,8 +93,19 @@ const GuestbookSetting: React.FC<GuestbookSettingProps> = (props) => {
     setSetting(setting);
   };
 
-  const handleSaveSetting = async () => {
-    let res = await pluginSaveGuestbookSetting(setting);
+  const handleChangePushWay = (e: any) => {
+    setSetting({
+      ...setting,
+      push_way: e.target.value,
+    });
+  };
+
+  const handleSaveSetting = async (values: any) => {
+    let postData = {
+      ...setting,
+      ...values,
+    };
+    let res = await pluginSaveGuestbookSetting(postData);
 
     if (res.code === 0) {
       message.success(res.msg);
@@ -170,6 +192,7 @@ const GuestbookSetting: React.FC<GuestbookSettingProps> = (props) => {
 
   return (
     <>
+      <VipModal />
       <div
         onClick={() => {
           setVisible(!visible);
@@ -177,38 +200,123 @@ const GuestbookSetting: React.FC<GuestbookSettingProps> = (props) => {
       >
         {props.children}
       </div>
-      <Modal
+      <ModalForm
         width={800}
         title={intl.formatMessage({ id: 'plugin.guestbook.setting' })}
         open={visible}
-        onCancel={() => {
-          setVisible(false);
+        onOpenChange={(flag) => {
+          setVisible(flag);
         }}
-        onOk={() => {
-          handleSaveSetting();
-        }}
+        formRef={formRef}
+        layout="horizontal"
+        labelCol={{ span: 4 }}
+        wrapperCol={{ span: 14 }}
+        onFinish={handleSaveSetting}
       >
         {fetched && (
-          <Row gutter={16}>
-            <Col>
-              <div style={{ lineHeight: '32px' }}>
-                <FormattedMessage id="plugin.guestbook.return-message" />
-              </div>
-            </Col>
-            <Col flex={1}>
-              <Input
-                name="return_message"
-                defaultValue={setting.return_message}
-                placeholder={intl.formatMessage({
-                  id: 'plugin.guestbook.return-message.placeholder',
-                })}
-                onChange={handleChangeReturnMessage}
+          <div>
+            <ProFormText
+              name="return_message"
+              label={intl.formatMessage({
+                id: 'plugin.guestbook.return-message',
+              })}
+              placeholder={intl.formatMessage({
+                id: 'plugin.guestbook.return-message.placeholder',
+              })}
+              extra={intl.formatMessage({
+                id: 'plugin.guestbook.return-message.description',
+              })}
+              fieldProps={{
+                defaultValue: setting.return_message,
+                onChange: handleChangeReturnMessage,
+              }}
+            />
+            <ProFormRadio.Group
+              name="push_way"
+              label="留言推送"
+              options={[
+                { label: '邮件(默认)', value: 0 },
+                { label: '站点', value: 1 },
+                { label: 'API接口', value: 2 },
+              ]}
+              disabled={isVip === false}
+              fieldProps={{
+                onChange: handleChangePushWay,
+              }}
+              extra={
+                !isVip ? (
+                  <div
+                    className="link"
+                    onClick={() => {
+                      checkVip(() => {});
+                    }}
+                  >
+                    留言推送为VIP功能，点击查看VIP
+                  </div>
+                ) : null
+              }
+            />
+            {setting.push_way === 0 && (
+              <ProFormText label="邮件设置" readonly>
+                <div>
+                  留言默认推送到邮件,需要到
+                  <Link to={'/plugin/sendmail'}>邮件提醒</Link>设置
+                </div>
+              </ProFormText>
+            )}
+            {setting.push_way === 1 && (
+              <ProFormSelect
+                name="site_id"
+                label="选择站点"
+                request={async () => {
+                  const res = await getWebsiteList();
+                  return (
+                    res.data
+                      ?.filter((item: any) => item.status === 1)
+                      .map((item: any) => ({
+                        label:
+                          item.name +
+                          '(ID: ' +
+                          item.id +
+                          ',URL: ' +
+                          item.base_url +
+                          ')',
+                        value: item.id,
+                        disabled: item.id === siteInfo.id,
+                      })) || []
+                  );
+                }}
               />
-              <div className="text-muted">
-                <FormattedMessage id="plugin.guestbook.return-message.description" />
+            )}
+            {setting.push_way === 2 && (
+              <div>
+                <ProFormText name="api_url" label="API地址" />
+                <ProFormText label="Header">
+                  <Space className="no-margin">
+                    <ProFormText
+                      name="header_key"
+                      addonBefore="Key"
+                      width={150}
+                    />
+                    <ProFormText
+                      width={200}
+                      name="header_value"
+                      addonBefore="Value"
+                    />
+                  </Space>
+                </ProFormText>
+                <ProFormRadio.Group
+                  name="api_method"
+                  label="提交方式"
+                  options={[
+                    { label: 'JSON', value: 'json' },
+                    { label: 'Form-Data', value: 'formdata' },
+                    { label: 'Query(GET)', value: 'query' },
+                  ]}
+                />
               </div>
-            </Col>
-          </Row>
+            )}
+          </div>
         )}
         <ProTable<any>
           rowKey="name"
@@ -237,7 +345,7 @@ const GuestbookSetting: React.FC<GuestbookSettingProps> = (props) => {
           columns={columns}
           pagination={false}
         />
-      </Modal>
+      </ModalForm>
       {editVisible && (
         <ModalForm
           width={600}

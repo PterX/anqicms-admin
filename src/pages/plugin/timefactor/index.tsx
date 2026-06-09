@@ -1,3 +1,4 @@
+import { useVipModal } from '@/components/vipModal';
 import {
   getCategories,
   getModules,
@@ -12,11 +13,12 @@ import {
   ProFormRadio,
   ProFormSelect,
 } from '@ant-design/pro-components';
-import { FormattedMessage, useIntl } from '@umijs/max';
+import { useIntl } from '@umijs/max';
 import { Alert, Card, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 const PluginTimeFactor: React.FC<any> = () => {
+  const { isVip, checkVip, VipModal } = useVipModal();
   const [setting, setSetting] = useState<any>({});
   const [fetched, setFetched] = useState<boolean>(false);
   const [modules, setModules] = useState<any[]>([]);
@@ -107,11 +109,11 @@ const PluginTimeFactor: React.FC<any> = () => {
       <Card>
         <Alert
           message={
-            <div>
-              <div>
-                <FormattedMessage id="plugin.timefactor.tips" />
-              </div>
-            </div>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: intl.formatMessage({ id: 'plugin.timefactor.tips' }),
+              }}
+            ></div>
           }
         />
         {fetched && (
@@ -144,6 +146,19 @@ const PluginTimeFactor: React.FC<any> = () => {
                       setRenewOpen(e.target.value);
                     },
                   }}
+                  disabled={isVip === false}
+                  extra={
+                    !isVip ? (
+                      <div
+                        className="link"
+                        onClick={() => {
+                          checkVip(() => {});
+                        }}
+                      >
+                        文档时间因子为VIP功能，点击查看VIP
+                      </div>
+                    ) : null
+                  }
                 />
                 {renewOpen && (
                   <>
@@ -347,6 +362,7 @@ const PluginTimeFactor: React.FC<any> = () => {
           </div>
         )}
       </Card>
+      <VipModal />
     </PageContainer>
   );
 };
