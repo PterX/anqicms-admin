@@ -24,7 +24,25 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
+.layout-vertical .ant-form-item-row {
+  flex-direction: column !important;
+}
+.layout-vertical .ant-form-item-row .ant-form-item-label {
+  margin: 0;
+  padding: 0 0 8px;
+  white-space: initial;
+  text-align: start;
+}
+.layout-vertical .ant-form-item-row .ant-form-item-label > label {
+  height: auto;
+  margin: 0;
+  &::after {
+    visibility: hidden;
+  }
+}
+.layout-vertical .ant-form-item-row .ant-form-item-control {
+  flex: 1 1 0%;
+}
 .text-muted {
   color: #999;
 }

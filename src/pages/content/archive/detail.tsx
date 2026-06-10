@@ -25,6 +25,7 @@ import {
   pluginGetUsers,
   saveArchive,
 } from '@/services';
+import { getPlaces, getPlaceSetting } from '@/services/place';
 import { getTags } from '@/services/tag';
 import { getStore, removeStore, setStore } from '@/utils/store';
 import {
@@ -56,12 +57,12 @@ import {
   Button,
   Card,
   Col,
+  message,
   Modal,
   Popover,
   Row,
   Space,
   Tag,
-  message,
 } from 'antd';
 import dayjs from 'dayjs';
 import React from 'react';
@@ -110,6 +111,8 @@ class ArchiveForm extends React.Component<intlProps> {
     ],
     selectedUser: {},
     categories: [],
+    placeSetting: {},
+    places: [],
 
     aiVisible: false,
     aiTitle: '',
@@ -218,6 +221,12 @@ class ArchiveForm extends React.Component<intlProps> {
           },
         });
       }
+    });
+    // placeSetting
+    getPlaceSetting().then((res) => {
+      this.setState({
+        placeSetting: res.data || {},
+      });
     });
   };
 
@@ -1466,6 +1475,7 @@ class ArchiveForm extends React.Component<intlProps> {
       searchArchives,
       searchUsers,
       categories,
+      placeSetting,
       newKey,
     } = this.state;
     return (
@@ -3162,6 +3172,59 @@ class ArchiveForm extends React.Component<intlProps> {
                       }}
                     />
                   </Card>
+                  {placeSetting.open && (
+                    <Card
+                      className="aside-card"
+                      size="small"
+                      title={this.props.intl.formatMessage({
+                        id: 'content.place.title',
+                      })}
+                    >
+                      <ProFormSelect
+                        showSearch
+                        name="place_id"
+                        request={async () => {
+                          const res = await getPlaces();
+                          return [
+                            {
+                              title: this.props.intl.formatMessage({
+                                id: 'content.parent_id.empty',
+                              }),
+                              value: 0,
+                            },
+                          ]
+                            .concat(res.data || [])
+                            .map((cat: any) => ({
+                              title: cat.title,
+                              label: (
+                                <div title={cat.title}>
+                                  {cat.parents?.length > 0 ? (
+                                    <span className="text-muted">
+                                      {cat.parents
+                                        ?.map((parent: any) => parent.title)
+                                        .join(' > ')}
+                                      {' > '}
+                                    </span>
+                                  ) : (
+                                    ''
+                                  )}
+                                  {cat.title}
+                                </div>
+                              ),
+                              value: cat.id,
+                              disabled: cat.status !== 1,
+                            }));
+                        }}
+                        fieldProps={{
+                          showSearch: true,
+                          filterOption: (input: string, option: any) =>
+                            (option?.title ?? option?.label)
+                              .toLowerCase()
+                              .includes(input.toLowerCase()),
+                        }}
+                      />
+                    </Card>
+                  )}
                   <Card
                     className="aside-card"
                     size="small"

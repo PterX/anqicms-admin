@@ -144,6 +144,16 @@ export default [
         name: 'attachment',
         component: '@/pages/content/attachment/index',
       },
+      {
+        path: '/archive/place',
+        name: 'place',
+        component: '@/pages/content/place/index',
+      },
+      {
+        hideInMenu: true,
+        path: '/archive/place/detail',
+        component: '@/pages/content/place/detail',
+      },
     ],
   },
   {

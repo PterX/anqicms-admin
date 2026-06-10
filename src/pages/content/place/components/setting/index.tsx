@@ -1,49 +1,41 @@
-import { useVipModal } from '@/components/vipModal';
-import { getSiteInfo, getWebsiteList } from '@/services';
-import {
-  pluginGetGuestbookSetting,
-  pluginSaveGuestbookSetting,
-} from '@/services/plugin/guestbook';
+import { getPlaceSetting, savePlaceSetting } from '@/services/place';
 import {
   ActionType,
   ModalForm,
   ProColumns,
   ProFormInstance,
   ProFormRadio,
-  ProFormSelect,
   ProFormText,
   ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
-import { FormattedMessage, Link, useIntl } from '@umijs/max';
+import { FormattedMessage, useIntl } from '@umijs/max';
 import { Button, Modal, Space, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
-import './index.less';
 
-export type GuestbookSettingProps = {
-  children?: React.ReactNode;
+export type PlaceSettingProps = {
+  onCancel: (flag?: boolean) => void;
+  onSubmit: (flag?: boolean) => Promise<void>;
+  open: boolean;
 };
 
-const GuestbookSetting: React.FC<GuestbookSettingProps> = (props) => {
-  const { isVip, checkVip, VipModal } = useVipModal();
+let submitting = false;
+
+const PlaceSetting: React.FC<PlaceSettingProps> = (props) => {
   const formRef = useRef<ProFormInstance>();
   const actionRef = useRef<ActionType>();
-  const [visible, setVisible] = useState<boolean>(false);
   const [editVisible, setEditVisible] = useState<boolean>(false);
   const [currentField, setCurrentField] = useState<any>({});
   const [setting, setSetting] = useState<any>({ fields: [] });
   const [fetched, setFetched] = useState<boolean>(false);
-  const [siteInfo, setSiteInfo] = useState<any>({});
   const intl = useIntl();
 
   const getSetting = async () => {
-    getSiteInfo({}).then((res) => {
-      setSiteInfo(res?.data || {});
-    });
-    const res = await pluginGetGuestbookSetting();
+    const res = await getPlaceSetting({});
     let setting = res.data || { fields: [] };
-    setSetting(setting);
+
     formRef.current?.setFieldsValue(setting);
+    setSetting(setting);
     setFetched(true);
   };
 
@@ -51,13 +43,11 @@ const GuestbookSetting: React.FC<GuestbookSettingProps> = (props) => {
     getSetting();
   }, []);
 
-  const handleRemoveItem = (index: number) => {
+  const handleRemoveItem = (record: any, index: number) => {
     Modal.confirm({
-      title: intl.formatMessage({
-        id: 'plugin.guestbook.field.delete.confirm',
-      }),
+      title: intl.formatMessage({ id: 'content.module.field.delete.confirm' }),
       content: intl.formatMessage({
-        id: 'plugin.guestbook.field.delete.confirm.content',
+        id: 'content.module.field.delete.content',
       }),
       onOk: async () => {
         setting.fields.splice(index, 1);
@@ -73,6 +63,11 @@ const GuestbookSetting: React.FC<GuestbookSettingProps> = (props) => {
   const handleSaveField = async (values: any) => {
     if (!setting.fields) {
       setting.fields = [];
+    }
+    let reg = /^[a-z][0-9a-z_]+$/;
+    if (!values.field_name || !reg.test(values.field_name)) {
+      message.error(intl.formatMessage({ id: 'content.module.field.error' }));
+      return;
     }
     let exists = false;
     for (let i in setting.fields) {
@@ -92,34 +87,45 @@ const GuestbookSetting: React.FC<GuestbookSettingProps> = (props) => {
     setEditVisible(false);
   };
 
-  const handleChangeReturnMessage = (e: any) => {
-    setting.return_message = e.target.value;
-    setSetting(setting);
-  };
-
-  const handleChangePushWay = (e: any) => {
-    setSetting({
-      ...setting,
-      push_way: e.target.value,
-    });
-  };
-
   const handleSaveSetting = async (values: any) => {
+    if (submitting) {
+      return;
+    }
+    submitting = true;
+    let hide = message.loading(
+      intl.formatMessage({ id: 'setting.system.submitting' }),
+      0,
+    );
+
     let postData = {
       ...setting,
       ...values,
     };
-    let res = await pluginSaveGuestbookSetting(postData);
 
-    if (res.code === 0) {
-      message.success(res.msg);
-      setEditVisible(false);
-      if (actionRef.current) {
-        actionRef.current.reload();
-      }
-    } else {
-      message.error(res.msg);
-    }
+    savePlaceSetting(postData)
+      .then((res) => {
+        if (res.code === 0) {
+          message.success(res.msg);
+          setEditVisible(false);
+          if (actionRef.current) {
+            actionRef.current.reload();
+          }
+          props.onSubmit();
+        } else {
+          message.error(res.msg);
+        }
+      })
+      .finally(() => {
+        submitting = false;
+        hide();
+      });
+  };
+
+  const handleChangeOpen = (e: any) => {
+    setSetting({
+      ...setting,
+      open: e.target.value,
+    });
   };
 
   const columns: ProColumns<any>[] = [
@@ -169,26 +175,26 @@ const GuestbookSetting: React.FC<GuestbookSettingProps> = (props) => {
       dataIndex: 'option',
       render: (text: any, record, index) => (
         <Space size={20}>
-          <>
-            <a
-              onClick={() => {
-                setCurrentField(record);
-                setEditVisible(true);
-              }}
-            >
-              <FormattedMessage id="setting.action.edit" />
-            </a>
-            {!record.is_system && (
+          {!record.is_system && (
+            <>
+              <a
+                onClick={() => {
+                  setCurrentField(record);
+                  setEditVisible(true);
+                }}
+              >
+                <FormattedMessage id="setting.action.edit" />
+              </a>
               <a
                 className="text-red"
                 onClick={() => {
-                  handleRemoveItem(index);
+                  handleRemoveItem(record, index);
                 }}
               >
                 <FormattedMessage id="setting.system.delete" />
               </a>
-            )}
-          </>
+            </>
+          )}
         </Space>
       ),
     },
@@ -196,159 +202,79 @@ const GuestbookSetting: React.FC<GuestbookSettingProps> = (props) => {
 
   return (
     <>
-      <VipModal />
-      <div
-        onClick={() => {
-          setVisible(!visible);
-        }}
-      >
-        {props.children}
-      </div>
       <ModalForm
-        width={800}
-        title={intl.formatMessage({ id: 'plugin.guestbook.setting' })}
-        open={visible}
+        width={1000}
+        title={intl.formatMessage({ id: 'content.place.setting' })}
+        open={props.open}
         onOpenChange={(flag) => {
-          setVisible(flag);
+          if (!flag) {
+            props.onCancel();
+          }
         }}
         formRef={formRef}
-        layout="horizontal"
-        labelCol={{ span: 4 }}
-        wrapperCol={{ span: 14 }}
         onFinish={handleSaveSetting}
       >
         {fetched && (
           <div>
-            <ProFormText
-              name="return_message"
-              label={intl.formatMessage({
-                id: 'plugin.guestbook.return-message',
-              })}
-              placeholder={intl.formatMessage({
-                id: 'plugin.guestbook.return-message.placeholder',
-              })}
-              extra={intl.formatMessage({
-                id: 'plugin.guestbook.return-message.description',
-              })}
+            <ProFormRadio.Group
+              name="open"
+              label="启用城市功能"
+              options={[
+                { label: '停用', value: false },
+                { label: '启用', value: true },
+              ]}
               fieldProps={{
-                defaultValue: setting.return_message,
-                onChange: handleChangeReturnMessage,
+                onChange: handleChangeOpen,
               }}
             />
             <ProFormRadio.Group
-              name="push_way"
-              label="留言推送"
+              name="url_type"
+              label="城市分站形式"
               options={[
-                { label: '邮件(默认)', value: 0 },
-                { label: '站点', value: 1 },
-                { label: 'API接口', value: 2 },
+                { label: '无', value: '' },
+                { label: '子域名', value: 'subdomain' },
+                { label: '子目录', value: 'directory' },
               ]}
-              disabled={isVip === false}
-              fieldProps={{
-                onChange: handleChangePushWay,
-              }}
-              extra={
-                !isVip ? (
-                  <div
-                    className="link"
-                    onClick={() => {
-                      checkVip(() => {});
-                    }}
-                  >
-                    留言推送为VIP功能，点击查看VIP
-                  </div>
-                ) : null
-              }
             />
-            {setting.push_way === 0 && (
-              <ProFormText label="邮件设置" readonly>
-                <div>
-                  留言默认推送到邮件,需要到
-                  <Link to={'/plugin/sendmail'}>邮件提醒</Link>设置
-                </div>
-              </ProFormText>
-            )}
-            {setting.push_way === 1 && (
-              <ProFormSelect
-                name="site_id"
-                label="选择站点"
-                request={async () => {
-                  const res = await getWebsiteList();
-                  return (
-                    res.data
-                      ?.filter((item: any) => item.status === 1)
-                      .map((item: any) => ({
-                        label:
-                          item.name +
-                          '(ID: ' +
-                          item.id +
-                          ',URL: ' +
-                          item.base_url +
-                          ')',
-                        value: item.id,
-                        disabled: item.id === siteInfo.id,
-                      })) || []
-                  );
-                }}
-              />
-            )}
-            {setting.push_way === 2 && (
-              <div>
-                <ProFormText name="api_url" label="API地址" />
-                <ProFormText label="Header">
-                  <Space className="no-margin">
-                    <ProFormText
-                      name="header_key"
-                      addonBefore="Key"
-                      width={150}
-                    />
-                    <ProFormText
-                      width={200}
-                      name="header_value"
-                      addonBefore="Value"
-                    />
-                  </Space>
-                </ProFormText>
-                <ProFormRadio.Group
-                  name="api_method"
-                  label="提交方式"
-                  options={[
-                    { label: 'JSON', value: 'json' },
-                    { label: 'Form-Data', value: 'formdata' },
-                    { label: 'Query(GET)', value: 'query' },
-                  ]}
-                />
-              </div>
-            )}
+            <ProTable<any>
+              key="fields-table"
+              rowKey="name"
+              search={false}
+              actionRef={actionRef}
+              toolBarRender={() => [
+                <Button
+                  key="add"
+                  type="primary"
+                  onClick={() => {
+                    setCurrentField({
+                      type: 'text',
+                      required: false,
+                      follow_level: false,
+                      is_filter: false,
+                    });
+                    setEditVisible(true);
+                  }}
+                >
+                  <FormattedMessage id="content.module.field.add" />
+                </Button>,
+              ]}
+              tableAlertRender={false}
+              tableAlertOptionRender={false}
+              request={async () => {
+                return {
+                  data: setting.fields || [],
+                  success: true,
+                };
+              }}
+              columnsState={{
+                persistenceKey: 'module-fields-table',
+                persistenceType: 'localStorage',
+              }}
+              columns={columns}
+              pagination={false}
+            />
           </div>
         )}
-        <ProTable<any>
-          rowKey="name"
-          search={false}
-          actionRef={actionRef}
-          toolBarRender={() => [
-            <Button
-              key="add"
-              type="primary"
-              onClick={() => {
-                setCurrentField({ type: 'text', required: false });
-                setEditVisible(true);
-              }}
-            >
-              <FormattedMessage id="content.module.field.add" />
-            </Button>,
-          ]}
-          tableAlertRender={false}
-          tableAlertOptionRender={false}
-          request={async () => {
-            return {
-              data: setting.fields || [],
-              success: true,
-            };
-          }}
-          columns={columns}
-          pagination={false}
-        />
       </ModalForm>
       {editVisible && (
         <ModalForm
@@ -403,6 +329,9 @@ const GuestbookSetting: React.FC<GuestbookSettingProps> = (props) => {
               textarea: intl.formatMessage({
                 id: 'content.module.field.type.textarea',
               }),
+              editor: intl.formatMessage({
+                id: 'content.module.field.type.editor',
+              }),
               radio: intl.formatMessage({
                 id: 'content.module.field.type.radio',
               }),
@@ -415,8 +344,20 @@ const GuestbookSetting: React.FC<GuestbookSettingProps> = (props) => {
               image: intl.formatMessage({
                 id: 'content.module.field.type.image',
               }),
+              images: intl.formatMessage({
+                id: 'content.module.field.type.images',
+              }),
               file: intl.formatMessage({
                 id: 'content.module.field.type.file',
+              }),
+              texts: intl.formatMessage({
+                id: 'content.module.field.type.texts',
+              }),
+              archive: intl.formatMessage({
+                id: 'content.module.field.type.archive',
+              }),
+              category: intl.formatMessage({
+                id: 'content.module.field.type.category',
               }),
             }}
           />
@@ -440,8 +381,47 @@ const GuestbookSetting: React.FC<GuestbookSettingProps> = (props) => {
               },
             ]}
           />
+          <ProFormRadio.Group
+            name="follow_level"
+            label={intl.formatMessage({ id: 'content.read-level.name' })}
+            options={[
+              {
+                label: intl.formatMessage({
+                  id: 'content.module.field.level.none',
+                }),
+                value: false,
+              },
+              {
+                label: intl.formatMessage({
+                  id: 'content.module.field.level.follow',
+                }),
+                value: true,
+              },
+            ]}
+          />
+          <ProFormRadio.Group
+            name="is_filter"
+            label={intl.formatMessage({ id: 'content.module.field.isfilter' })}
+            options={[
+              {
+                label: intl.formatMessage({
+                  id: 'content.module.field.isfilter.no',
+                }),
+                value: false,
+              },
+              {
+                label: intl.formatMessage({
+                  id: 'content.module.field.isfilter.yes',
+                }),
+                value: true,
+              },
+            ]}
+            extra={intl.formatMessage({
+              id: 'content.module.field.isfilter.description',
+            })}
+          />
           <ProFormTextArea
-            label={intl.formatMessage({ id: 'content.category.default' })}
+            label={intl.formatMessage({ id: 'content.param.default' })}
             name="content"
             fieldProps={{
               rows: 4,
@@ -456,4 +436,4 @@ const GuestbookSetting: React.FC<GuestbookSettingProps> = (props) => {
   );
 };
 
-export default GuestbookSetting;
+export default PlaceSetting;
