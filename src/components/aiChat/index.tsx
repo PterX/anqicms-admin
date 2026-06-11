@@ -331,9 +331,6 @@ const AiChat: React.FC<AiChatProps> = ({ visible, onClose }) => {
   // handleSend — SSE 流式处理，按 SSE 事件到达顺序构建 segments
   // =====================================================================
   const handleSend = async (overrideMessage?: string) => {
-    message.warning('AI功能还在开发中，请耐心等待下次更新');
-    return;
-
     const messageContent = (overrideMessage || inputValue).trim();
     if (!messageContent || loading) return;
     setInputValue('');
