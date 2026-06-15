@@ -7,6 +7,7 @@ import {
 } from '@/services/plugin/sitemap';
 import {
   ProForm,
+  ProFormDigit,
   ProFormInstance,
   ProFormRadio,
   ProFormSelect,
@@ -154,6 +155,15 @@ const PluginSitemap: React.FC<any> = () => {
                       }),
                     },
                   ]}
+                />
+                <ProFormDigit
+                  name="page_size"
+                  label={intl.formatMessage({
+                    id: 'plugin.sitemap.page-size',
+                  })}
+                  extra={intl.formatMessage({
+                    id: 'plugin.sitemap.page-size.description',
+                  })}
                 />
                 <ProFormSelect
                   name={'exclude_module_ids'}

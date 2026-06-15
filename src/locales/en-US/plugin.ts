@@ -1133,6 +1133,9 @@ export default {
   'plugin.sitemap.exclude-tag': 'Document tag generation Sitemap',
   'plugin.sitemap.exclude-tag.no': 'generate',
   'plugin.sitemap.exclude-tag.yes': 'Not generated',
+  'plugin.sitemap.page-size': 'Number of links per Sitemap',
+  'plugin.sitemap.page-size.description':
+    'The default number of links contained in each Sitemap file is 20,000, with a maximum of 50,000 links per Sitemap file.',
   'plugin.sitemap.exculde-module': 'Excluded document models',
   'plugin.sitemap.exculde-module.description':
     'If you want to exclude certain document models, you can select it here',

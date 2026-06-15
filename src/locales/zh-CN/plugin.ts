@@ -1030,6 +1030,9 @@ export default {
   'plugin.sitemap.exclude-tag': '文档标签生成Sitemap',
   'plugin.sitemap.exclude-tag.no': '生成',
   'plugin.sitemap.exclude-tag.yes': '不生成',
+  'plugin.sitemap.page-size': '每个Sitemap链接数',
+  'plugin.sitemap.page-size.description':
+    '每个Sitemap文件所包含的链接数，默认为20000条/Sitemap文件，最大为50000条/Sitemap文件。',
   'plugin.sitemap.exculde-module': '排除的文档模型',
   'plugin.sitemap.exculde-module.description':
     '如果你想排除某些文档模型，可以在这里选择',
