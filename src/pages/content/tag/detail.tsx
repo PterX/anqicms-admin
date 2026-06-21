@@ -3,8 +3,6 @@ import AiGenerate from '@/components/aiGenerate';
 import AiGetTdk from '@/components/aitdk';
 import AttachmentSelect from '@/components/attachment';
 import CollapseItem from '@/components/collaspeItem';
-import MarkdownEditor from '@/components/markdown';
-import NewAiEditor from '@/components/newAiEditor';
 import {
   anqiExtractDescription,
   getArchives,
@@ -39,14 +37,16 @@ import {
   Card,
   Col,
   Image,
+  message,
   Modal,
   Row,
   Space,
   Tag,
-  message,
 } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { lazy, useEffect, useRef, useState } from 'react';
 import './index.less';
+const MarkdownEditor = lazy(() => import('@/components/markdown'));
+const NewAiEditor = lazy(() => import('@/components/newAiEditor'));
 
 const ArchiveTagDetail: React.FC = () => {
   const formRef = useRef<ProFormInstance>();

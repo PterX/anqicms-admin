@@ -6,16 +6,19 @@ import config from '@/services/config';
 import { getSessionStore, getStore } from '@/utils/store';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
-import { Button, Input, Modal, Space, Tooltip, message } from 'antd';
+import { Button, Input, Modal, Space, Spin, Tooltip, message } from 'antd';
 import {
   forwardRef,
+  lazy,
+  Suspense,
   useEffect,
   useImperativeHandle,
   useRef,
   useState,
 } from 'react';
-import MonacoEditor from 'react-monaco-editor';
 import AttachmentSelect from '../attachment';
+
+const MonacoEditor = lazy(() => import('react-monaco-editor'));
 import './index.less';
 import MaterialSelect, { MaterialElement } from './material';
 
@@ -499,21 +502,24 @@ const NewAiEditor: React.FC<NewAiEditorProps> = forwardRef((props, ref) => {
           </div>
         </div>
         {htmlMode && (
-          <MonacoEditor
-            height={563}
-            language={'html'}
-            theme="vs-dark"
-            value={codes[props.field]}
-            options={{
-              minimap: {
-                enabled: false,
-              },
-              selectOnLineNumbers: false,
-              wordWrap: 'on',
-            }}
-            onChange={onChangeCode}
-            editorDidMount={() => {}}
-          />
+          <Suspense fallback={<Spin style={{ display: 'block', margin: '200px auto' }} />}>
+            <MonacoEditor
+              height={563}
+              language={'html'}
+              theme="vs-dark"
+              value={codes[props.field]}
+              options={{
+                minimap: {
+                  enabled: false,
+                },
+                selectOnLineNumbers: false,
+                wordWrap: 'on',
+              }}
+              onChange={onChangeCode}
+              editorDidMount={() => {}}
+              editorWillUnmount={() => {}}
+            />
+          </Suspense>
         )}
       </div>
       {materialVisible && (

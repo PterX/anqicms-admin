@@ -1,7 +1,5 @@
 import NewContainer from '@/components/NewContainer';
 import AttachmentSelect from '@/components/attachment';
-import MarkdownEditor from '@/components/markdown';
-import NewAiEditor from '@/components/newAiEditor';
 import {
   getArchives,
   getCategories,
@@ -34,14 +32,16 @@ import {
   Card,
   Col,
   Image,
+  message,
   Modal,
   Row,
   Space,
   Tag,
-  message,
 } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import './index.less';
+const MarkdownEditor = lazy(() => import('@/components/markdown'));
+const NewAiEditor = lazy(() => import('@/components/newAiEditor'));
 
 const SettingDiyFieldFrom: React.FC<any> = () => {
   const formRef = useRef<ProFormInstance>();
@@ -502,27 +502,29 @@ const SettingDiyFieldFrom: React.FC<any> = () => {
                       }) + item.content
                     }
                   >
-                    {contentSetting.editor === 'markdown' ? (
-                      <MarkdownEditor
-                        className="mb-normal"
-                        setContent={async (val) =>
-                          updateExtraContent(index, val)
-                        }
-                        content={item.value || ''}
-                        ref={null}
-                      />
-                    ) : (
-                      <NewAiEditor
-                        className="mb-normal"
-                        setContent={async (val) => {
-                          updateExtraContent(index, val);
-                        }}
-                        content={item.value || ''}
-                        key={item.name}
-                        field={item.name}
-                        ref={null}
-                      />
-                    )}
+                    <Suspense fallback={<div style={{ height: 500 }} />}>
+                      {contentSetting.editor === 'markdown' ? (
+                        <MarkdownEditor
+                          className="mb-normal"
+                          setContent={async (val) =>
+                            updateExtraContent(index, val)
+                          }
+                          content={item.value || ''}
+                          ref={null}
+                        />
+                      ) : (
+                        <NewAiEditor
+                          className="mb-normal"
+                          setContent={async (val) => {
+                            updateExtraContent(index, val);
+                          }}
+                          content={item.value || ''}
+                          key={item.name}
+                          field={item.name}
+                          ref={null}
+                        />
+                      )}
+                    </Suspense>
                   </ProFormText>
                 ) : item.type === 'radio' ? (
                   <ProFormRadio.Group

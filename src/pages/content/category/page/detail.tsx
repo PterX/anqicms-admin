@@ -2,8 +2,6 @@ import NewContainer from '@/components/NewContainer';
 import AiGenerate from '@/components/aiGenerate';
 import AiGetTdk from '@/components/aitdk';
 import AttachmentSelect from '@/components/attachment';
-import MarkdownEditor from '@/components/markdown';
-import NewAiEditor from '@/components/newAiEditor';
 import {
   anqiExtractDescription,
   getCategoryInfo,
@@ -23,9 +21,11 @@ import {
   ProFormTextArea,
 } from '@ant-design/pro-components';
 import { FormattedMessage, history, useIntl } from '@umijs/max';
-import { Button, Card, Col, Image, Modal, Row, Space, message } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import { Button, Card, Col, Image, message, Modal, Row, Space } from 'antd';
+import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import '../index.less';
+const MarkdownEditor = lazy(() => import('@/components/markdown'));
+const NewAiEditor = lazy(() => import('@/components/newAiEditor'));
 
 const categoryType = 3;
 
@@ -328,7 +328,7 @@ const PageCategoryDetail: React.FC = () => {
                   extra={intl.formatMessage({ id: 'content.page.status.tips' })}
                 />
                 {loaded && (
-                  <>
+                  <Suspense fallback={<div style={{ height: 500 }} />}>
                     {contentSetting.editor === 'markdown' ? (
                       <MarkdownEditor
                         className="mb-normal"
@@ -350,7 +350,7 @@ const PageCategoryDetail: React.FC = () => {
                         content={content}
                       />
                     )}
-                  </>
+                  </Suspense>
                 )}
               </Col>
               <Col sm={6} xs={24}>

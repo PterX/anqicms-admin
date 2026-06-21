@@ -330,25 +330,6 @@ const ModuleForm: React.FC<ModuleFormProps> = (props) => {
               <Row className="mt-normal" gutter={16}>
                 <Col>
                   <div style={{ lineHeight: '32px', width: '120px' }}>
-                    <FormattedMessage id="content.module.title-name" />:
-                  </div>
-                </Col>
-                <Col flex={1}>
-                  <Input
-                    name="title_name"
-                    defaultValue={setting.title_name}
-                    onChange={(e: any) => {
-                      handleChangeInput('title_name', e);
-                    }}
-                  />
-                  <div className="text-muted">
-                    <FormattedMessage id="content.module.title-name.description" />
-                  </div>
-                </Col>
-              </Row>
-              <Row className="mt-normal" gutter={16}>
-                <Col>
-                  <div style={{ lineHeight: '32px', width: '120px' }}>
                     <FormattedMessage id="content.category.status" />:
                   </div>
                 </Col>

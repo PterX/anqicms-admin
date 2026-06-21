@@ -1,7 +1,10 @@
 import { useIntl } from '@umijs/max';
-import { Modal } from 'antd';
-import React, { useEffect, useState } from 'react';
-import { MonacoDiffEditor } from 'react-monaco-editor';
+import { Modal, Spin } from 'antd';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
+
+const MonacoDiffEditor = lazy(() =>
+  import('react-monaco-editor').then((m) => ({ default: m.MonacoDiffEditor })),
+);
 
 export type TemplateCompareProps = {
   originCode: string;
@@ -47,22 +50,27 @@ const TemplateCompare: React.FC<TemplateCompareProps> = (props) => {
       }}
       width={1000}
     >
-      <MonacoDiffEditor
-        width="950"
-        height="600"
-        language={props.language}
-        original={props.originCode}
-        value={code}
-        options={{
-          selectOnLineNumbers: false,
-          renderSideBySide: false,
-          // originalEditable: true,
-          automaticLayout: true,
-          wordWrap: 'on',
-        }}
-        onChange={onChangeCode}
-        editorDidMount={editorDidMount}
-      />
+      <Suspense
+        fallback={<Spin style={{ display: 'block', margin: '200px auto' }} />}
+      >
+        <MonacoDiffEditor
+          width="950"
+          height="600"
+          language={props.language}
+          original={props.originCode}
+          value={code}
+          options={{
+            selectOnLineNumbers: false,
+            renderSideBySide: false,
+            // originalEditable: true,
+            automaticLayout: true,
+            wordWrap: 'on',
+          }}
+          onChange={onChangeCode}
+          editorDidMount={() => {}}
+          editorWillUnmount={() => {}}
+        />
+      </Suspense>
     </Modal>
   );
 };

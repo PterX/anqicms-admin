@@ -84,11 +84,6 @@ const ModuleList: React.FC = () => {
       dataIndex: 'table_name',
     },
     {
-      title: intl.formatMessage({ id: 'content.module.title-name' }),
-      dataIndex: 'title_name',
-      hideInSearch: true,
-    },
-    {
       title: intl.formatMessage({ id: 'content.module.issystem' }),
       dataIndex: 'is_system',
       hideInSearch: true,

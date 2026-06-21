@@ -6,8 +6,6 @@ import AttachmentSelect from '@/components/attachment';
 import ImageItem from '@/components/attachment/image';
 import CollapseItem from '@/components/collaspeItem';
 import Keywords from '@/components/keywords';
-import MarkdownEditor from '@/components/markdown';
-import NewAiEditor from '@/components/newAiEditor';
 import SelectColor from '@/components/selectColor';
 import {
   anqiExtractDescription,
@@ -68,6 +66,8 @@ import dayjs from 'dayjs';
 import React from 'react';
 import { IntlShape } from 'react-intl';
 import './index.less';
+const MarkdownEditor = React.lazy(() => import('@/components/markdown'));
+const NewAiEditor = React.lazy(() => import('@/components/newAiEditor'));
 
 export type intlProps = {
   intl: IntlShape;

@@ -3,8 +3,6 @@ import AiGenerate from '@/components/aiGenerate';
 import AiGetTdk from '@/components/aitdk';
 import AttachmentSelect from '@/components/attachment';
 import CollapseItem from '@/components/collaspeItem';
-import MarkdownEditor from '@/components/markdown';
-import NewAiEditor from '@/components/newAiEditor';
 import {
   anqiExtractDescription,
   getArchives,
@@ -37,14 +35,16 @@ import {
   Card,
   Col,
   Image,
+  message,
   Modal,
   Row,
   Space,
   Tag,
-  message,
 } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import './index.less';
+const MarkdownEditor = lazy(() => import('@/components/markdown'));
+const NewAiEditor = lazy(() => import('@/components/newAiEditor'));
 
 const PlaceDetail: React.FC = () => {
   const formRef = useRef<ProFormInstance>();
@@ -1005,25 +1005,33 @@ const PlaceDetail: React.FC = () => {
                             }
                           >
                             {contentSetting.editor === 'markdown' ? (
-                              <MarkdownEditor
-                                className="mb-normal"
-                                setContent={(html) =>
-                                  updateExtraContent(item.field_name, html)
-                                }
-                                content={extraContent[item.field_name] || ''}
-                                ref={null}
-                              />
+                              <Suspense
+                                fallback={<div style={{ height: 500 }} />}
+                              >
+                                <MarkdownEditor
+                                  className="mb-normal"
+                                  setContent={(html) =>
+                                    updateExtraContent(item.field_name, html)
+                                  }
+                                  content={extraContent[item.field_name] || ''}
+                                  ref={null}
+                                />
+                              </Suspense>
                             ) : (
-                              <NewAiEditor
-                                className="mb-normal"
-                                setContent={(html) =>
-                                  updateExtraContent(item.field_name, html)
-                                }
-                                content={extraContent[item.field_name] || ''}
-                                key={item.field_name}
-                                field={item.field_name}
-                                ref={null}
-                              />
+                              <Suspense
+                                fallback={<div style={{ height: 500 }} />}
+                              >
+                                <NewAiEditor
+                                  className="mb-normal"
+                                  setContent={(html) =>
+                                    updateExtraContent(item.field_name, html)
+                                  }
+                                  content={extraContent[item.field_name] || ''}
+                                  key={item.field_name}
+                                  field={item.field_name}
+                                  ref={null}
+                                />
+                              </Suspense>
                             )}
                           </ProFormText>
                         ),
@@ -1031,25 +1039,29 @@ const PlaceDetail: React.FC = () => {
                   </CollapseItem>
                 )}
                 {contentSetting.editor === 'markdown' ? (
-                  <MarkdownEditor
-                    className="mb-normal"
-                    setContent={async (html: string) => {
-                      setContent(html);
-                    }}
-                    content={content}
-                    ref={editorRef}
-                  />
+                  <Suspense fallback={<div style={{ height: 500 }} />}>
+                    <MarkdownEditor
+                      className="mb-normal"
+                      setContent={async (html: string) => {
+                        setContent(html);
+                      }}
+                      content={content}
+                      ref={editorRef}
+                    />
+                  </Suspense>
                 ) : (
-                  <NewAiEditor
-                    className="mb-normal"
-                    setContent={async (html: string) => {
-                      setContent(html);
-                    }}
-                    key="content"
-                    field="content"
-                    ref={editorRef}
-                    content={content}
-                  />
+                  <Suspense fallback={<div style={{ height: 500 }} />}>
+                    <NewAiEditor
+                      className="mb-normal"
+                      setContent={async (html: string) => {
+                        setContent(html);
+                      }}
+                      key="content"
+                      field="content"
+                      ref={editorRef}
+                      content={content}
+                    />
+                  </Suspense>
                 )}
               </Col>
               <Col sm={6} xs={24}>
