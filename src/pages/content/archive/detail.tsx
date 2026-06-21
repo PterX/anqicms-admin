@@ -1499,12 +1499,9 @@ class ArchiveForm extends React.Component<intlProps> {
                 <Col sm={18} xs={24}>
                   <ProFormText
                     name="title"
-                    label={
-                      module.title_name ||
-                      this.props.intl.formatMessage({
-                        id: 'content.title.name',
-                      })
-                    }
+                    label={this.props.intl.formatMessage({
+                      id: 'content.title.name',
+                    })}
                   />
                   <ProFormCheckbox.Group
                     name="flag"
