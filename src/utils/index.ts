@@ -10,7 +10,15 @@ import { getSessionStore, getStore } from './store';
 export const checkLogin = (permits: any): boolean => !!permits;
 
 export const acceptedExtensions =
-  '.jpg,.jpeg,.png,.gif,.webp,.svg,.bmp,.tiff,.avif,.webm,.mp4,.mp3,.zip,.rar,.pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.txt';
+  '.jpg,.jpeg,.png,.gif,.webp,.svg,.bmp,.tiff,.avif,.heic,.heif,.raw,' +
+  '.webm,.mp4,.mp3,.mov,.avi,.wmv,.mkv,.flv,.f4v,.m4v,.m4a,.wav,.flac,.aac,.ogg,' +
+  '.zip,.rar,.7z,.gz,.bz2,.xz,.zst,.tar,.tgz,' +
+  '.pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.txt,.csv,.tsv,.odt,.ods,.odp,.rtf,' +
+  '.json,.xml,.yaml,.yml,.toml,.ini,.cfg,.conf,.env,.sql,.log,' +
+  '.md,.markdown,.rst,.tex,' +
+  '.js,.jsx,.ts,.tsx,.vue,.go,.py,.java,.c,.cpp,.h,.hpp,.rs,.rb,.sh,.bat,.ps1,.swift,.kt,.scala,.dart,.lua,.css,.scss,.less,.styl,' +
+  '.psd,.ai,.eps,.sketch,.fig,' +
+  '.ttf,.otf,.woff,.woff2,.eot';
 export const queryParams = (params: any) => {
   let _result = [];
   for (let key in params) {

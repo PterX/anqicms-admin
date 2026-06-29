@@ -196,3 +196,125 @@ export async function getAiHistories(
     options,
   });
 }
+
+export async function getAiSessions(
+  params?: any,
+  options?: { [key: string]: any },
+) {
+  return get({
+    url: '/anqi/ai/sessions',
+    params,
+    options,
+  });
+}
+
+export async function anqiAiUpload(
+  body: any,
+  options?: { [key: string]: any },
+) {
+  return post({
+    url: '/anqi/ai/upload',
+    body,
+    options,
+  });
+}
+
+export async function getAiSettings(
+  params?: any,
+  options?: { [key: string]: any },
+) {
+  return get({
+    url: '/anqi/ai/settings',
+    params,
+    options,
+  });
+}
+
+export async function saveAiSettings(
+  body: any,
+  options?: { [key: string]: any },
+) {
+  return post({
+    url: '/anqi/ai/settings',
+    body,
+    options,
+  });
+}
+
+export async function getAiAgents(
+  params?: any,
+  options?: { [key: string]: any },
+) {
+  return get({
+    url: '/anqi/ai/agents',
+    params,
+    options,
+  });
+}
+
+// ── Skill 管理 ──
+
+export async function getSkillList(
+  params?: any,
+  options?: { [key: string]: any },
+) {
+  return get({
+    url: '/anqi/skill/list',
+    params,
+    options,
+  });
+}
+
+export async function getSkillDetail(
+  params?: any,
+  options?: { [key: string]: any },
+) {
+  return get({
+    url: '/anqi/skill/detail',
+    params,
+    options,
+  });
+}
+
+export async function anqiSkillEdit(
+  body: any,
+  options?: { [key: string]: any },
+) {
+  return post({
+    url: '/anqi/skill/edit',
+    body,
+    options,
+  });
+}
+
+export async function anqiSkillDelete(
+  body: any,
+  options?: { [key: string]: any },
+) {
+  return post({
+    url: '/anqi/skill/delete',
+    body,
+    options,
+  });
+}
+
+export async function anqiSkillReload(
+  body?: any,
+  options?: { [key: string]: any },
+) {
+  return post({
+    url: '/anqi/skill/reload',
+    body,
+    options,
+  });
+}
+
+export async function getAiAgentLogs(
+  agentId: number,
+  options?: { [key: string]: any },
+) {
+  return get({
+    url: `/anqi/ai/agents/${agentId}/logs`,
+    options,
+  });
+}

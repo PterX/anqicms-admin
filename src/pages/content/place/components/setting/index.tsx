@@ -236,6 +236,15 @@ const PlaceSetting: React.FC<PlaceSettingProps> = (props) => {
                 { label: '子目录', value: 'directory' },
               ]}
             />
+            <ProFormRadio.Group
+              name="content_type"
+              label="城市分站内容形式"
+              options={[
+                { label: '默认', value: '' },
+                { label: '全站复用', value: 'full' },
+              ]}
+              extra="启用全站复用后，城市分站将使用全站内容，URL为分站URL（慎用）。"
+            />
             <ProTable<any>
               key="fields-table"
               rowKey="name"

@@ -115,8 +115,6 @@ const PlaceList: React.FC = () => {
   };
 
   const handleShowSetting = () => {
-    setSettingVisible(true);
-    return;
     checkVip(() => {
       setSettingVisible(true);
     }, '城市管理功能需要VIP会员。');
